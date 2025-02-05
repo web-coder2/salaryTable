@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Data</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <h1>Salary Data Management</h1>
+
+            <!-- Форма для добавления/редактирования данных -->
+            <div class="card">
+                <div class="card-header">
+                    {{ editing ? 'Edit Data' : 'Add New Data' }}
+                </div>
+                <div class="card-body">
+                    <form @submit.prevent="saveData">
+                        <div class="form-group">
+                            <label>Date:</label>
+                            <input type="date" class="form-control" v-model="formData.date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>SummHold12:</label>
+                            <input type="number" class="form-control" v-model.number="formData.summHold12" required>
+                        </div>
+                        <div class="form-group">
+                            <label>SummHold3:</label>
+                            <input type="number" class="form-control" v-model.number="formData.summHold3" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Is Work Day:</label>
+                            <select class="form-control" v-model="formData.isWorkDay" required>
+                                <option :value="true">Yes</option>
+                                <option :value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Office:</label>
+                            <input type="number" class="form-control" v-model.number="formData.office" required>
+                        </div>
+                        <div class="form-group">
+                                                        <label>Oklad:</label>
+                            <input type="number" class="form-control" v-model.number="formData.oklad" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Robot:</label>
+                            <input type="number" class="form-control" v-model.number="formData.robot" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Aproov:</label>
+                            <input type="number" step="0.01" class="form-control" v-model.number="formData.aproov" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">{{ editing ? 'Update' : 'Save' }}</button>
+                        <button type="button" class="btn btn-secondary" @click="cancelEdit" v-if="editing">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Таблица с данными -->
+            <table class="table table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>SummHold12</th>
+                        <th>SummHold3</th>
+                        <th>Is Work Day</th>
+                        <th>Office</th>
+                        <th>Oklad</th>
+                        <th>Robot</th>
+                        <th>Aproov</th>
+                        <th>Actions</th>
+                        <th>Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in data" :key="item.id">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.summHold12 }}</td>
+                        <td>{{ item.summHold3 }}</td>
+                        <td>{{ item.isWorkDay ? 'Yes' : 'No' }}</td>
+                        <td>{{ item.office }}</td>
+                        <td>{{ item.oklad }}</td>
+                        <td>{{ item.robot }}</td>
+                        <td>{{ item.aproov }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" @click="editData(item)"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-danger" @click="deleteData(item.id)"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-success" @click="calculateSalary(item.id)">Calculate</button>
+                            <div v-if="salaryResults[item.id]">
+                                <p>Director: {{ salaryResults[item.id].salaryDirector }}</p>
+                                <p>Supervisor: {{ salaryResults[item.id].salarySupervizer }}</p>
+                                <p>Trafficman: {{ salaryResults[item.id].salaryTraficman }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                data: [],
+                formData: {
+                    date: '',
+                    summHold12: 0,
+                    summHold3: 0,
+                    isWorkDay: true,
+                    office: 0,
+                    oklad: 0,
+                    robot: 0,
+                    aproov: 0.6
+                },
+                editing: false,
+                editId: null,
+                salaryResults: {}
+            },
+            mounted() {
+                this.fetchData();
+            },
+            methods: {
+                async fetchData() {
+                    try {
+                        const response = await axios.get('http://127.0.0.1:5000/api/data');
+                        this.data = response.data;
+                    } catch (error) {
+                        console.error('Error fetching data:', error);
+                    }
+                },
+                async saveData() {
+                    try {
+                        if (this.editing) {
+                            await axios.put(`http://127.0.0.1:5000/api/data/${this.editId}`, this.formData);
+                        } else {
+                            await axios.post('http://127.0.0.1:5000/api/data', this.formData);
+                        }
+                        this.fetchData();
+                        this.resetForm();
+                        this.editing = false;
+                        this.editId = null;
+                    } catch (error) {
+                        console.error('Error saving data:', error);
+                    }
+                },
+                editData(item) {
+                    this.editing = true;
+                    this.editId = item.id;
+                    this.formData = { ...item }; // Копируем данные
+                },
+                async deleteData(id) {
+                    if (confirm('Are you sure you want to delete this data?')) {
+                        try {
+                            await axios.delete(`http://127.0.0.1:5000/api/data/${id}`);
+                            this.fetchData();
+                        } catch (error) {
+                            console.error('Error deleting data:', error);
+                        }
+                    }
+                },
+                resetForm() {
+                    this.formData = {
+                        date: '',
+                        summHold12: 0,
+                        summHold3: 0,
+                        isWorkDay: true,
+                        office: 0,
+                        oklad: 0,
+                        robot: 0,
+                        aproov: 0.6
+                    };
+                },
+                cancelEdit() {
+                    this.editing = false;
+                    this.editId = null;
+                    this.resetForm();
+                },
+                async calculateSalary(id) {
+                    try {
+                        const response = await axios.get(`http://127.0.0.1:5000/api/calculate/${id}`);
+                        this.$set(this.salaryResults, id, response.data);
+                    } catch (error) {
+                        console.error('Error calculating salary:', error);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
