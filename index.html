@@ -236,15 +236,14 @@
         </thead>
         <tbody>
         <tr v-for="(row, key) in tableKeys" :key="key">
-            <td><input type="number" class="table-input form-control" v-model.number="table[row]['director']"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="table[row]['supervisor']"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="table[row]['traffic_man']"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="table[row]['ladder']"></td>
-        </tr>
+        <td><input type="number" class="table-input form-control" v-model.number="row"></td>
+        <td><input type="number" class="table-input form-control" v-model.number="table[row]['director']"></td>
+        <td><input type="number" class="table-input form-control" v-model.number="table[row]['supervisor']"></td>
+        <td><input type="number" class="table-input form-control" v-model.number="table[row]['traffic_man']"></td>
+        </tr> <!--ladder table[row]['ladder']-->
         </tbody>
     </table>
     <button @click="saveTable" class="btn btn-success">Сохранить таблицу</button>
-
 </div>
 
 <script>

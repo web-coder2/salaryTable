@@ -63,22 +63,22 @@ def init_table_db():
     count = cursor.fetchone()[0]
     if count == 0:
         default_table = {
-            0: {"director": 3000, "supervisor": 2100, "traffic_man": 1400},
-            20000: {"director": 3600, "supervisor": 2600, "traffic_man": 1700},
-            40000: {"director": 4250, "supervisor": 3150, "traffic_man": 2050},
-            60000: {"director": 4950, "supervisor": 3750, "traffic_man": 2450},
-            80000: {"director": 5700, "supervisor": 4400, "traffic_man": 2900},
-            100000: {"director": 6500, "supervisor": 5100, "traffic_man": 3400},
-            120000: {"director": 7350, "supervisor": 5850, "traffic_man": 3950},
-            140000: {"director": 8250, "supervisor": 6650, "traffic_man": 4550},
-            160000: {"director": 9250, "supervisor": 7500, "traffic_man": 5200},
-            180000: {"director": 10300, "supervisor": 8400, "traffic_man": 5900},
-            200000: {"director": 11400, "supervisor": 9350, "traffic_man": 6650},
-            220000: {"director": 12550, "supervisor": 10350, "traffic_man": 7450},
-            240000: {"director": 13750, "supervisor": 11400, "traffic_man": 8300},
-            260000: {"director": 15000, "supervisor": 12500, "traffic_man": 9200},
-            280000: {"director": 16300, "supervisor": 13650, "traffic_man": 10200},
-            300000: {"director": 17650, "supervisor": 14850, "traffic_man": 11250}
+            0: {"director": 3000, "supervisor": 2100, "traffic_man": 1400, "ladder": 0},
+            20000: {"director": 3600, "supervisor": 2600, "traffic_man": 1700, "ladder": 20000},
+            40000: {"director": 4250, "supervisor": 3150, "traffic_man": 2050, "ladder": 40000},
+            60000: {"director": 4950, "supervisor": 3750, "traffic_man": 2450, "ladder": 60000},
+            80000: {"director": 5700, "supervisor": 4400, "traffic_man": 2900, "ladder": 80000},
+            100000: {"director": 6500, "supervisor": 5100, "traffic_man": 3400, "ladder": 100000},
+            120000: {"director": 7350, "supervisor": 5850, "traffic_man": 3950, "ladder": 120000},
+            140000: {"director": 8250, "supervisor": 6650, "traffic_man": 4550, "ladder": 140000},
+            160000: {"director": 9250, "supervisor": 7500, "traffic_man": 5200, "ladder": 160000},
+            180000: {"director": 10300, "supervisor": 8400, "traffic_man": 5900, "ladder": 180000},
+            200000: {"director": 11400, "supervisor": 9350, "traffic_man": 6650, "ladder": 200000},
+            220000: {"director": 12550, "supervisor": 10350, "traffic_man": 7450, "ladder": 220000},
+            240000: {"director": 13750, "supervisor": 11400, "traffic_man": 8300, "ladder": 240000},
+            260000: {"director": 15000, "supervisor": 12500, "traffic_man": 9200, "ladder": 260000},
+            280000: {"director": 16300, "supervisor": 13650, "traffic_man": 10200, "ladder": 280000},
+            300000: {"director": 17650, "supervisor": 14850, "traffic_man": 11250, "ladder": 300000}
         }
         for ladder, values in default_table.items():
             try:
