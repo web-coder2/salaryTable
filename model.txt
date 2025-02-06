@@ -19,10 +19,10 @@ table = {
 }
 
 data = {
-	date: String,
+	date: String (if date == saturday or date == sunday => isWordDay = false),
 	summHold12: int,
 	summHold3: int,
-	isWorkDay: boolean,
+	isWorkDay: boolean (if false => office = 0 & oklad = 0),
 	office: int,
 	oklad: int,
 	robot: int,
@@ -37,5 +37,18 @@ data = {
 	money3: summHold3 * 10 * aproov,
 	salaryDirector: VLOCUP(money3 + money12 - spent12 - spent3, table),
 	salarySupervizer: VLOCUP(money3 - spent3, table),
-	salaryTraficman: VLOCAP(money12- spent12, table)
+	salaryTraficman: VLOCAP(money12- spent12, table),
+	totalOfDay: money12 + money3 - spent12 - spent3 - salaryDirector - salarySupervizer - salaryTraficman
+}
+
+dataMouth = {
+	groupByDate(day) {
+		// групировать данные по месяцам (итого totalOfDay)
+	}
+}
+
+dataYear = {
+	groupByMounth(mounth) {
+		// групировать данные по году (итого totalOfDataMounth) 
+	}
 }
