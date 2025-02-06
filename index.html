@@ -1,439 +1,382 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salary Data</title>
+    <title>Финансовый учет</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         body {
-            padding: 20px;
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
+            margin: 20px;
             background-color: #f8f9fa;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1,
-        h2 {
+        h1, h2 {
             color: #343a40;
-            margin-bottom: 20px;
         }
 
-        .card {
-            margin-bottom: 20px;
-            border: none;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+        .container {
+            max-width: 95%;
+            margin: auto;
         }
 
-        .table {
-            background-color: #fff;
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-primary, .btn-success, .btn-info, .btn-danger {
+            margin-top: 10px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table-input {
+            width: 120px; /* Увеличена ширина инпутов */
+        }
+
+        .entry-table td, .entry-table th {
+            white-space: nowrap;
+            /* Предотвращает перенос текста */
+        }
+
+        .edit-button, .delete-button {
+            width: 120px;
+            margin-bottom: 5px; /* Добавлен отступ снизу */
+        }
+
+        .edit-form {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ced4da;
             border-radius: 5px;
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-        }
-
-        .table th,
-        .table td {
-            padding: 0.75rem;
-            vertical-align: top;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .table thead th {
-            vertical-align: bottom;
-            border-bottom: 2px solid #dee2e6;
-            background-color: #f1f3f5;
-            font-weight: 600;
-        }
-
-        /* Увеличиваем ширину колонок */
-        .table th:nth-child(1),
-        .table td:nth-child(1) {
-            width: 100px;
-        }
-
-        .table th:nth-child(2),
-        .table td:nth-child(2) {
-            width: 200px;
-        }
-
-        .table th:nth-child(3),
-        .table td:nth-child(3),
-        .table th:nth-child(4),
-        .table td:nth-child(4) {
-            width: 200px;
-        }
-
-        .table th:nth-child(5),
-        .table td:nth-child(5) {
-            width: 150px;
-        }
-
-        .table th:nth-child(12),
-        .table td:nth-child(12),
-        .table th:nth-child(13),
-        .table td:nth-child(13) {
-            width: 200px;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-
-        .btn-primary:hover {
-            background-color: #0069d9;
-            border-color: #0062cc;
-        }
-
-        .form-control:focus {
-            border-color: #80bdff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            .table-responsive {
-                overflow-x: auto;
-            }
-        }
-
-        /* Стили для сетки */
-        .grid-form {
-            margin-top: 30px;
-        }
-
-        .grid-form .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .grid-form .form-row>div {
-            padding: 5px;
-        }
-
-        .grid-form label {
-            font-weight: bold;
-            margin-right: 10px;
+            background-color: #ffffff;
         }
     </style>
 </head>
-
 <body>
-    <div id="app">
-        <div class="container">
-            <h1>Salary Data Management</h1>
 
-            <!-- Форма для добавления/редактирования данных -->
-            <div class="card">
-                <div class="card-header">
-                    {{ editing ? 'Edit Data' : 'Add New Data' }}
-                </div>
-                <div class="card-body">
-                    <form @submit.prevent="saveData">
-                        <div class="form-group">
-                            <label>Date:</label>
-                            <input type="date" class="form-control" v-model="formData.date" required>
-                        </div>
-                        <div class="form-group">
-                            <label>SummHold12:</label>
-                            <input type="number" class="form-control" v-model.number="formData.summHold12" required>
-                        </div>
-                        <div class="form-group">
-                            <label>SummHold3:</label>
-                            <input type="number" class="form-control" v-model.number="formData.summHold3" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Is Work Day:</label>
-                            <select class="form-control" v-model="formData.isWorkDay" required>
-                                <option :value="true">Yes</option>
-                                <option :value="false">No</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Office:</label>
-                            <input type="number" class="form-control" v-model.number="formData.office" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Oklad:</label>
-                            <input type="number" class="form-control" v-model.number="formData.oklad" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Robot:</label>
-                            <input type="number" class="form-control" v-model.number="formData.robot" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Aproov:</label>
-                            <input type="number" step="0.01" class="form-control" v-model.number="formData.aproov"
-                                required>
-                        </div>
+<div id="app" class="container">
 
-                        <button type="submit" class="btn btn-primary">{{ editing ? 'Update' : 'Save' }}</button>
-                        <button type="button" class="btn btn-secondary" @click="cancelEdit" v-if="editing">Cancel</button>
-                    </form>
-                </div>
-            </div>
+    <h1>Финансовый учет</h1>
 
-            <!-- Таблица с данными -->
-            <div class="table-responsive">
-                <table class="table table-striped mt-3">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Date</th>
-                            <th>SummHold12</th>
-                            <th>SummHold3</th>
-                            <th>Is Work Day</th>
-                            <th>Office</th>
-                            <th>Oklad</th>
-                            <th>Robot</th>
-                            <th>Aproov</th>
-                            <th>Salary Director</th>
-                            <th>Salary Supervisor</th>
-                            <th>Salary Trafficman</th>
-                            <th>Total Of Day</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in data" :key="item.id">
-                            <td>{{ item.id }}</td>
-                            <td>{{ item.date }}</td>
-                            <td>{{ item.summHold12 }}</td>
-                            <td>{{ item.summHold3 }}</td>
-                            <td>{{ item.isWorkDay ? 'Yes' : 'No' }}</td>
-                            <td>{{ item.office }}</td>
-                            <td>{{ item.oklad }}</td>
-                            <td>{{ item.robot }}</td>
-                            <td>{{ item.aproov }}</td>
-                            <td>{{ item.salaryDirector }}</td>
-                            <td>{{ item.salarySupervizer }}</td>
-                            <td>{{ item.salaryTraficman }}</td>
-                            <td>{{ item.totalOfDay }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-info" @click="editData(item)"><i
-                                        class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger" @click="deleteData(item.id)"><i
-                                        class="fas fa-trash-alt"></i></button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Форма для редактирования сетки -->
-            <h2 class="mt-4">Edit Grid</h2>
-            <form @submit.prevent="saveGrid" class="grid-form">
-                <div v-for="(row, key) in gridData" :key="key" class="form-row">
-                    <div>
-                        <label>{{ key }}</label>
-                    </div>
-                    <div>
-                        <input type="number" class="form-control" v-model.number="row[0]">
-                    </div>
-                    <div>
-                        <input type="number" class="form-control" v-model.number="row[1]">
-                    </div>
-                    <div>
-                        <input type="number" class="form-control" v-model.number="row[2]">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Grid</button>
-            </form>
-
-            <!-- Сводка по месяцам -->
-            <h2 class="mt-4">Monthly Summary</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th>Total Of Day</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in monthlySummary" :key="item.month">
-                            <td>{{ item.month }}</td>
-                            <td>{{ item.totalOfDay }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                </div>
-
-            <!-- Сводка по годам -->
-            <h2 class="mt-4">Yearly Summary</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Year</th>
-                            <th>Total Of Day</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in yearlySummary" :key="item.year">
-                            <td>{{ item.year }}</td>
-                            <td>{{ item.totalOfDay }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <h2>Добавить запись</h2>
+    <form @submit.prevent="addData">
+        <div class="form-group">
+            <label>Дата:</label>
+            <input type="date" class="form-control" v-model="newEntry.date" required>
         </div>
+        <div class="form-group">
+            <label>Сумма Холдов 12:</label>
+            <input type="number" class="form-control" v-model.number="newEntry.sumHold12" required>
+        </div>
+        <div class="form-group">
+            <label>Сумма Холдов 3:</label>
+            <input type="number" class="form-control" v-model.number="newEntry.sumHold3" required>
+        </div>
+        <div class="form-group">
+            <label>Робот:</label>
+            <input type="number" class="form-control" v-model.number="newEntry.robot" required>
+        </div>
+        <div class="form-group">
+            <label>Оклад:</label>
+                        <input type="number" class="form-control" v-model.number="newEntry.oklad" required>
+        </div>
+        <div class="form-group">
+            <label>Офис:</label>
+            <input type="number" class="form-control" v-model.number="newEntry.office" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить запись</button>
+    </form>
+
+    <h2>Список записей</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered entry-table">
+            <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Сумма 12</th>
+                <th>Сумма 3</th>
+                <th>Робот</th>
+                <th>Оклад</th>
+                <th>Офис</th>
+                <th>Aproov</th>
+                <th>Зарплата 12</th>
+                <th>Зарплата 3</th>
+                <th>Налог 12</th>
+                <th>Налог 3</th>
+                <th>Потрачено 12</th>
+                <th>Потрачено 3</th>
+                <th>Деньги 12</th>
+                <th>Деньги 3</th>
+                <th>Зарплата Директора</th>
+                <th>Зарплата Супервайзера</th>
+                <th>Зарплата Трафик-мена</th>
+                <th>Итого</th>
+                <th style="width: 250px;">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, index) in data" :key="index">
+                <td>{{ item.date }}</td>
+                <td>{{ item.sumHold12 }}</td>
+                <td>{{ item.sumHold3 }}</td>
+                <td>{{ item.robot }}</td>
+                <td>{{ item.oklad }}</td>
+                <td>{{ item.office }}</td>
+                <td>{{ item.aproov }}</td>
+                <td>{{ item.salary12 }}</td>
+                <td>{{ item.salary3 }}</td>
+                <td>{{ item.nalog12 }}</td>
+                <td>{{ item.nalog3 }}</td>
+                <td>{{ item.spent12 }}</td>
+                <td>{{ item.spent3 }}</td>
+                <td>{{ item.plus12 }}</td>
+                <td>{{ item.plus3 }}</td>
+                <td>{{ item.salaryDirector }}</td>
+                <td>{{ item.salarySupervizer }}</td>
+                <td>{{ item.salaryTraficman }}</td>
+                <td>{{ item.total }}</td>
+                <td>
+                    <div style="display: flex; flex-direction: column;">
+                        <button @click="editEntry(index)" class="btn btn-secondary btn-sm edit-button">
+                            {{ editingIndex === index ? 'Скрыть' : 'Редактировать' }}
+                        </button>
+                        <button @click="deleteData(index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        new Vue({
-            el: '#app',
-            data: {
-                data: [],
-                formData: {
-                    date: '',
-                    summHold12: 0,
-                    summHold3: 0,
-                    isWorkDay: true,
-                    office: 0,
-                    oklad: 0,
-                    robot: 0,
-                    aproov: 0.6
-                },
-                editing: false,
-                editId: null,
-                monthlySummary: [],
-                yearlySummary: [],
-                gridData: {
-                    0: [3000, 2100, 1400],
-                    20000: [3600, 2600, 1700],
-                    40000: [4250, 3150, 2050],
-                    60000: [4950, 3750, 2450],
-                    80000: [5700, 4400, 2900],
-                    100000: [6500, 5100, 3400],
-                    120000: [7350, 5850, 3950],
-                    140000: [8250, 6650, 4550],
-                    160000: [9250, 7500, 5200],
-                    180000: [10300, 8400, 5900],
-                    200000: [11400, 9350, 6650],
-                    220000: [12550, 10350, 7450],
-                    240000: [13750, 11400, 8300],
-                    260000: [15000, 12500, 9200],
-                    280000: [16300, 13650, 10200],
-                    300000: [17650, 14850, 11250]
-                }
-            },
-            mounted() {
-                this.fetchData();
-                this.fetchMonthlySummary();
-                this.fetchYearlySummary();
-                this.fetchGridData();
-            },
-            methods: {
-                async fetchData() {
-                    try {
-                        const response = await axios.get('http://127.0.0.1:5000/api/data');
-                        this.data = response.data;
-                    } catch (error) {
-                        console.error('Error fetching data:', error);
-                    }
-                },
-                async saveData() {
-                    try {
-                        if (this.editing) {
-                            await axios.put(`http://127.0.0.1:5000/api/data/${this.editId}`, this.formData);
-                        } else {
-                            await axios.post('http://127.0.0.1:5000/api/data', this.formData);
-                        }
-                        this.fetchData();
-                        this.resetForm();
-                        this.editing = false;
-                        this.editId = null;
-                        this.fetchMonthlySummary(); // Обновляем сводку
-                        this.fetchYearlySummary(); // Обновляем сводку
-                    } catch (error) {
-                        console.error('Error saving data:', error);
-                    }
-                },
-                editData(item) {
-                    this.editing = true;
-                    this.editId = item.id;
-                    this.formData = { ...item };
-                },
-                async deleteData(id) {
-                    if (confirm('Are you sure you want to delete this data?')) {
-                        try {
-                            await axios.delete(`http://127.0.0.1:5000/api/data/${id}`);
-                            this.fetchData();
-                            this.fetchMonthlySummary(); // Обновляем сводку
-                            this.fetchYearlySummary(); // Обновляем сводку
-                        } catch (error) {
-                            console.error('Error deleting data:', error);
-                        }
-                    }
-                },
-                resetForm() {
-                    this.formData = {
-                        date: '',
-                        summHold12: 0,
-                        summHold3: 0,
-                        isWorkDay: true,
-                        office: 0,
-                        oklad: 0,
-                        robot: 0,
-                        aproov: 0.6
-                    };
-                },
-                cancelEdit() {
-                    this.editing = false;
-                    this.editId = null;
-                    this.resetForm();
-                },
-                async fetchMonthlySummary() {
-                    try {
-                        const response = await axios.get('http://127.0.0.1:5000/api/data/summary/month');
-                        this.monthlySummary = response.data;
-                    } catch (error) {
-                        console.error('Error fetching monthly summary:', error);
-                    }
-                },
-                async fetchYearlySummary() {
-                    try {
-                        const response = await axios.get('http://127.0.0.1:5000/api/data/summary/year');
-                        this.yearlySummary = response.data;
-                    } catch (error) {
-                        console.error('Error fetching yearly summary:', error);
-                    }
-                },
-                async fetchGridData() {
-                    try {
-                        const response = await axios.get('http://127.0.0.1:5000/api/grid');
-                        this.gridData = response.data;
-                    } catch (error) {
-                        console.error('Error fetching grid data:', error);
-                    }
-                },
-                async saveGrid() {
-                    try {
-                        await axios.post('http://127.0.0.1:5000/api/grid', this.gridData);
-                        this.fetchData(); // Обновляем данные
-                        this.fetchMonthlySummary(); // Обновляем сводку
-                        this.fetchYearlySummary(); // Обновляем сводку
+    <div v-if="editingIndex !== null" class="edit-form">
+        <h2>Редактировать запись</h2>
+        <form @submit.prevent="updateData">
+            <div class="form-group">
+                <label>Дата:</label>
+                <input type="date" class="form-control" v-model="editedEntry.date" required>
+            </div>
+            <div class="form-group">
+                <label>Сумма Холдов 12:</label>
+                <input type="number" class="form-control" v-model.number="editedEntry.sumHold12" required>
+            </div>
+            <div class="form-group">
+                <label>Сумма Холдов 3:</label>
+                <input type="number" class="form-control" v-model.number="editedEntry.sumHold3" required>
+            </div>
+            <div class="form-group">
+                <label>Робот:</label>
+                <input type="number" class="form-control" v-model.number="editedEntry.robot" required>
+            </div>
+            <div class="form-group">
+                <label>Оклад:</label>
+                <input type="number" class="form-control" v-model.number="editedEntry.oklad" required>
+            </div>
+            <div class="form-group">
+                <label>Офис:</label>
+                <input type="number" class="form-control" v-model.number="editedEntry.office" required>
+            </div>
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+        </form>
+    </div>
 
-                    } catch (error) {
-                        console.error('Error saving grid:', error);
-                    }
-                }
+    <button @click="toggleMonthlyData" class="btn btn-info">Показать/Скрыть месячные данные</button>
+    <button @click="toggleYearlyData" class="btn btn-info">Показать/Скрыть годовые данные</button>
+
+    <div v-if="showMonthlyData">
+        <h2>Сгруппированные данные по месяцам</h2>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Месяц</th>
+                <th>Итого</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, month) in monthlyData" :key="month">
+                <td>{{ month }}</td>
+                <td>{{ item.total }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div v-if="showYearlyData">
+        <h2>Сгруппированные данные по годам</h2>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Год</th>
+                <th>Итого</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(item, year) in yearlyData" :key="year">
+                <td>{{ year }}</td>
+                <td>{{ item.total }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Редактировать таблицу</h2>
+    <table class="table table-bordered" v-if="Object.keys(table).length > 0">
+        <thead>
+        <tr>
+            <th>Лестница</th>
+            <th>Директор</th>
+            <th>Супервайзер</th>
+            <th>Трафик-мен</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="(row, key) in tableKeys" :key="key">
+            <td><input type="number" class="table-input form-control" v-model.number="table[row]['director']"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="table[row]['supervisor']"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="table[row]['traffic_man']"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="table[row]['ladder']"></td>
+        </tr>
+        </tbody>
+    </table>
+    <button @click="saveTable" class="btn btn-success">Сохранить таблицу</button>
+
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            table: {},
+            data: [],
+            newEntry: {
+                date: '',
+                sumHold12: 0,
+                sumHold3: 0,
+                robot: 0,
+                oklad: 0,
+                office: 0
+            },
+            editingIndex: null,
+            editedEntry: {
+                date: '',
+                sumHold12: 0,
+                sumHold3: 0,
+                robot: 0,
+                oklad: 0,
+                office: 0
+            },
+            monthlyData: {},
+            yearlyData: {},
+            showMonthlyData: false,
+            showYearlyData: false
+        },
+        computed: {
+            tableKeys() {
+                return Object.keys(this.table).sort((a, b) => a - b);
             }
-        });
-    </script>
-</body>
+        },
+        mounted() {
+            this.fetchData();
+            this.fetchTable();
+        },
+        methods: {
+            async fetchData() {
+                try {
+                    const response = await axios.get('http://localhost:5000/api/data');
+                    this.data = response.data;
+                } catch (error) {
+                    console.error('Ошибка при загрузке данных:', error);
+                }
+            },
+            async addData() {
+                try {
+                    await axios.post('http://localhost:5000/api/data', this.newEntry);
+                    this.newEntry = {
+                        date: '',
+                        sumHold12: 0,
+                        sumHold3: 0,
+                        robot: 0,
+                        oklad: 0,
+                        office: 0
+                    };
+                    await this.fetchData();
+                } catch (error) {
+                    console.error('Ошибка при добавлении данных:', error);
+                }
+            },
+            async deleteData(index) {
+                try {
+                    await axios.delete(`http://localhost:5000/api/data/${index}`);
+                    await this.fetchData();
+                } catch (error) {
+                    console.error('Ошибка при удалении данных:', error);
+                }
+            },
+            editEntry(index) {
+                if (this.editingIndex === index) {
+                    this.editingIndex = null; // Скрыть форму
+                } else {
+                    this.editingIndex = index;
+                    // Клонируем данные для редактирования
+                    this.editedEntry = { ...this.data[index] };
+                }
+            },
+            async updateData() {
+                try {
+                    await axios.put(`http://localhost:5000/api/data/${this.editingIndex}`, this.editedEntry);
+                    await this.fetchData(); // Обновляем таблицу
+                    this.editingIndex = null; // Скрываем форму
+                } catch (error) {
+                    console.error('Ошибка при обновлении данных:', error);
+                }
+            },
+            async fetchTable() {
+                try {
+                    const response = await axios.get('http://localhost:5000/api/table');
+                    this.table = response.data;
+                } catch (error) {
+                    console.error('Ошибка при загрузке таблицы:', error);
+                }
+            },
+            async saveTable() {
+                try {
+                    await axios.post('http://localhost:5000/api/table', this.table);
+                    alert('Таблица сохранена!');
+                    await this.fetchData();
+                } catch (error) {
+                    console.error('Ошибка при сохранении таблицы:', error);
+                }
+            },
+            async toggleMonthlyData() {
+                if (!this.showMonthlyData) {
+                    try {
+                        const response = await axios.get('http://localhost:5000/api/data/grouped/monthly');
+                        this.monthlyData = response.data;
+                    } catch (error) {
+                        console.error('Ошибка при загрузке месячных данных:', error);
+                    }
+                }
+                this.showMonthlyData = !this.showMonthlyData;
+            },
+            async toggleYearlyData() {
+                if (!this.showYearlyData) {
+                    try {
+                        const response = await axios.get('http://localhost:5000/api/data/grouped/yearly');
+                        this.yearlyData = response.data;
+                    } catch (error) {
+                        console.error('Ошибка при загрузке годовых данных:', error);
+                    }
+                }
+                this.showYearlyData = !this.showYearlyData;
+            }
+        }
+    })
+</script>
 
+</body>
 </html>

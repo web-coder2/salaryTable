@@ -1,387 +1,335 @@
 
 from flask import Flask, jsonify, request
+import datetime
 from flask_cors import CORS
 import sqlite3
-import datetime
-import json  # Для работы с JSON
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})  # Только для разработки!
+CORS(app)
 
-DATABASE = 'salary_data.db'
-GRID_FILE = 'grid_data.json' # Файл для хранения сетки
+DATABASE = 'data.db'
 
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
 
-def create_table():
+def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS salary_data (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT NOT NULL,
-                summHold12 INTEGER NOT NULL,
-                summHold3 INTEGER NOT NULL,
-                isWorkDay INTEGER NOT NULL,
-                office INTEGER NOT NULL,
-                oklad INTEGER NOT NULL,
-                robot INTEGER NOT NULL,
-                aproov REAL NOT NULL,
-                salary12 REAL,
-                salary3 REAL,
-                nalog12 REAL,
-                nalog3 REAL,
-                spent12 REAL,
-                spent3 REAL,
-                money12 REAL,
-                money3 REAL,
-                salaryDirector REAL,
-                salarySupervizer REAL,
-                salaryTraficman REAL,
-                totalOfDay REAL
-            )
-        """)
-        conn.commit()
-    except Exception as e:
-        print(f"Error creating table: {e}")
-    finally:
-        conn.close()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            sumHold12 INTEGER NOT NULL,
+            sumHold3 INTEGER NOT NULL,
+            robot INTEGER NOT NULL,
+            oklad INTEGER NOT NULL,
+            office INTEGER NOT NULL,
+            aproov REAL NOT NULL,
+            nalog12 INTEGER,
+            nalog3 INTEGER,
+            salary12 INTEGER,
+            salary3 INTEGER,
+            spent12 INTEGER,
+            spent3 INTEGER,
+            salaryDirector INTEGER,
+            salarySupervizer INTEGER,
+            salaryTraficman INTEGER,
+            plus12 INTEGER,
+            plus3 INTEGER,
+            total INTEGER
+        )
+    """)
+    conn.commit()
+    conn.close()
 
-create_table()
+# Создаем таблицу table, если она не существует
+def init_table_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS salary_table (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ladder INTEGER NOT NULL UNIQUE,
+            director INTEGER NOT NULL,
+            supervisor INTEGER NOT NULL,
+            traffic_man INTEGER NOT NULL
+        )
+    """)
 
-# --- API для сетки ---
-def load_grid():
-    """Загрузка сетки из файла."""
-    try:
-        with open(GRID_FILE, 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return { # Значение по умолчанию, если файл не найден
-            0: [3000, 2100, 1400],
-            20000: [3600, 2600, 1700],
-            40000: [4250, 3150, 2050],
-            60000: [4950, 3750, 2450],
-            80000: [5700, 4400, 2900],
-            100000: [6500, 5100, 3400],
-            120000: [7350, 5850, 3950],
-            140000: [8250, 6650, 4550],
-            160000: [9250, 7500, 5200],
-            180000: [10300, 8400, 5900],
-            200000: [11400, 9350, 6650],
-            220000: [12550, 10350, 7450],
-            240000: [13750, 11400, 8300],
-            260000: [15000, 12500, 9200],
-            280000: [16300, 13650, 10200],
-            300000: [17650, 14850, 11250]
+    # Заполняем таблицу значениями по умолчанию, если она пуста
+    cursor.execute("SELECT COUNT(*) FROM salary_table")
+    count = cursor.fetchone()[0]
+    if count == 0:
+        default_table = {
+            0: {"director": 3000, "supervisor": 2100, "traffic_man": 1400},
+            20000: {"director": 3600, "supervisor": 2600, "traffic_man": 1700},
+            40000: {"director": 4250, "supervisor": 3150, "traffic_man": 2050},
+            60000: {"director": 4950, "supervisor": 3750, "traffic_man": 2450},
+            80000: {"director": 5700, "supervisor": 4400, "traffic_man": 2900},
+            100000: {"director": 6500, "supervisor": 5100, "traffic_man": 3400},
+            120000: {"director": 7350, "supervisor": 5850, "traffic_man": 3950},
+            140000: {"director": 8250, "supervisor": 6650, "traffic_man": 4550},
+            160000: {"director": 9250, "supervisor": 7500, "traffic_man": 5200},
+            180000: {"director": 10300, "supervisor": 8400, "traffic_man": 5900},
+            200000: {"director": 11400, "supervisor": 9350, "traffic_man": 6650},
+            220000: {"director": 12550, "supervisor": 10350, "traffic_man": 7450},
+            240000: {"director": 13750, "supervisor": 11400, "traffic_man": 8300},
+            260000: {"director": 15000, "supervisor": 12500, "traffic_man": 9200},
+            280000: {"director": 16300, "supervisor": 13650, "traffic_man": 10200},
+            300000: {"director": 17650, "supervisor": 14850, "traffic_man": 11250}
         }
-    except json.JSONDecodeError:
-        print("Error decoding grid data from JSON.  Using default grid.")
-        return { # Значение по умолчанию, если JSON поврежден
-            0: [3000, 2100, 1400],
-            20000: [3600, 2600, 1700],
-            40000: [4250, 3150, 2050],
-            60000: [4950, 3750, 2450],
-            80000: [5700, 4400, 2900],
-            100000: [6500, 5100, 3400],
-            120000: [7350, 5850, 3950],
-            140000: [8250, 6650, 4550],
-            160000: [9250, 7500, 5200],
-            180000: [10300, 8400, 5900],
-            200000: [11400, 9350, 6650],
-            220000: [12550, 10350, 7450],
-            240000: [13750, 11400, 8300],
-            260000: [15000, 12500, 9200],
-            280000: [16300, 13650, 10200],
-            300000: [17650, 14850, 11250]
-        }
+        for ladder, values in default_table.items():
+            try:
+                cursor.execute("""
+                    INSERT INTO salary_table (ladder, director, supervisor, traffic_man)
+                    VALUES (?, ?, ?, ?)
+                """, (ladder, values["director"], values["supervisor"], values["traffic_man"]))
+                conn.commit()
+            except sqlite3.IntegrityError:
+                # Обработка ошибки, если ladder уже существует
+                print(f"Ladder {ladder} already exists in salary_table")
+                conn.rollback()
+    conn.close()
 
-def save_grid(grid_data):
-    """Сохранение сетки в файл."""
-    try:
-        with open(GRID_FILE, 'w') as f:
-            json.dump(grid_data, f, indent=4)
-        return True
-    except Exception as e:
-        print(f"Error saving grid: {e}")
-        return False
+# Default aproov value
+DEFAULT_APROOV = 0.6
 
-@app.route('/api/grid', methods=['GET'])
-def get_grid():
-    """Получение текущей сетки."""
-    grid = load_grid()
-    return jsonify(grid)
+def vlookup(value, table, column):
+    """Имитация функции VLOOKUP."""
+    keys = sorted(table.keys())
+    for i in range(len(keys) - 1):
+        if value >= keys[i] and value < keys[i + 1]:
+            return table[keys[i]][column]
+    return table[keys[-1]][column]
 
-@app.route('/api/grid', methods=['POST'])
-def update_grid():
-    """Обновление сетки."""
-    grid_data = request.get_json()
-    if save_grid(grid_data):
-        # Пересчитать все данные в базе данных после изменения сетки!
-        recalculate_all_data()
-        return jsonify({'message': 'Grid updated successfully!'})
-    else:
-        return jsonify({'message': 'Error updating grid'}), 500
+def calculate_data(item):
+    """Вычисляет значения для элемента данных."""
+    aproov = float(item.get('aproov', DEFAULT_APROOV))
+    sumHold12 = int(item['sumHold12'])
+    sumHold3 = int(item['sumHold3'])
+    robot = int(item['robot'])
+    oklad = int(item['oklad'])
+    office = int(item['office'])
 
-def calculate_data(data, grid):  # Передаем сетку как аргумент
-    """Вычисление зарплаты и связанных данных."""
-    def vlookup(value, table, column_index):
-        """Эмуляция VLOOKUP."""
-        keys = sorted(table.keys())
-        for i in range(len(keys) - 1):
-            if value >= keys[i] and value < keys[i + 1]:
-                return table[keys[i]][column_index]
-        return table[keys[-1]][column_index]
+    nalog12 = int(sumHold12 * 10 * aproov * 0.07)
+    nalog3 = int(sumHold3 * 10 * aproov * 0.07)
 
-    summHold12 = data['summHold12']
-    summHold3 = data['summHold3']
-    office = data['office']
-    oklad = data['oklad']
-    robot = data['robot']
-    aproov = data['aproov']
+    salary12 = int(0.37 * (sumHold12 * aproov) / 0.63 + sumHold12 * aproov)
+    salary3 = int(0.37 * (sumHold3 * aproov) / 0.63 + sumHold3 * aproov)
 
-    salary12 = (0.37 * (summHold12 + summHold3) * aproov) / 0.63 + summHold12 * aproov
-    salary3 = (0.37 * (summHold12 + summHold3) * aproov) / 0.63 + summHold3 * aproov
-    nalog12 = salary12 * aproov * 0.07
-    nalog3 = salary3 * aproov * 0.07
-    spent12 = (robot / 2) + office + nalog12 + salary12
-    spent3 = (robot / 2) + oklad + nalog3 + salary3
-    money12 = summHold12 * 10 * aproov
-    money3 = summHold3 * 10 * aproov
+    spent12 = int((robot / 2) + oklad + nalog12 + salary12)
+    spent3 = int((robot / 2) + office + nalog3 + salary3)
 
-    salaryDirector = vlookup(money3 + money12 - spent12 - spent3, grid, 0)
-    salarySupervizer = vlookup(money3 - spent3, grid, 1)
-    salaryTraficman = vlookup(money12 - spent12, grid, 2)
-    totalOfDay = money12 + money3 - spent12 - spent3 - salaryDirector - salarySupervizer - salaryTraficman
+    plus12 = int(sumHold12 * aproov * 10)
+    plus3 = int(sumHold3 * aproov * 10)
 
-    return {
-        'salary12': salary12,
-        'salary3': salary3,
-        'nalog12': nalog12,
-        'nalog3': nalog3,
-        'spent12': spent12,
-        'spent3': spent3,
-        'money12': money12,
-        'money3': money3,
-        'salaryDirector': salaryDirector,
-        'salarySupervizer': salarySupervizer,
-        'salaryTraficman': salaryTraficman,
-        'totalOfDay': totalOfDay
-    }
+    # Получаем таблицу из базы данных
+    table = get_salary_table_from_db()
 
-def recalculate_data(data, grid):  # Pass data and grid
-    """Recalculates salary data based on the grid."""
-    try:
-        calculated_data = calculate_data(data, grid) # Pass grid
-        data.update(calculated_data)
-        return data
-    except Exception as e:
-        print(f"Error recalculating data: {e}")
-        return None
+    salaryDirector = int(vlookup(plus3 + plus12 - spent12 - spent3, table, 'director'))
+    salarySupervizer = int(vlookup(plus3 - spent3, table, 'supervisor'))
+    salaryTraficman = int(vlookup(plus12 - spent12, table, 'traffic_man'))
+
+    total = int(plus12 + plus3 - salaryDirector - salarySupervizer - salaryTraficman - spent12 - spent3)
+
+    item['aproov'] = aproov
+    item['sumHold12'] = sumHold12
+    item['sumHold3'] = sumHold3
+    item['robot'] = robot
+    item['oklad'] = oklad
+    item['office'] = office
+    item['nalog12'] = nalog12
+    item['nalog3'] = nalog3
+    item['salary12'] = salary12
+    item['salary3'] = salary3
+    item['spent12'] = spent12
+    item['spent3'] = spent3
+    item['salaryDirector'] = salaryDirector
+    item['salarySupervizer'] = salarySupervizer
+    item['salaryTraficman'] = salaryTraficman
+    item['plus12'] = plus12
+    item['plus3'] = plus3
+    item['total'] = total
+
+    return item
 
 def recalculate_all_data():
-    """Пересчитывает все данные в базе данных."""
-    grid = load_grid() # Load the grid
-
+    """Пересчитывает все записи данных с использованием текущей таблицы."""
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("SELECT * FROM data")
+    rows = cursor.fetchall()
+    data = [dict(row) for row in rows]  # Преобразуем в список словарей
+    conn.close()
 
-    try:
-        cursor.execute("SELECT * FROM salary_data")
-        all_data = cursor.fetchall()
+    for i in range(len(data)):
+        data[i] = calculate_data(data[i].copy())
 
-        for row in all_data:
-            data = dict(row)  # Convert to dictionary
-            recalculated_data = recalculate_data(data, grid) # Pass grid
+    # Обновляем данные в базе данных
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    for item in data:
+        cursor.execute("""
+            UPDATE data SET 
+                date=?, sumHold12=?, sumHold3=?, robot=?, oklad=?, office=?, aproov=?,
+                nalog12=?, nalog3=?, salary12=?, salary3=?, spent12=?, spent3=?,
+                salaryDirector=?, salarySupervizer=?, salaryTraficman=?, plus12=?, plus3=?, total=?
+            WHERE id=?
+        """, (item['date'], item['sumHold12'], item['sumHold3'], item['robot'], item['oklad'], item['office'], item['aproov'],
+              item['nalog12'], item['nalog3'], item['salary12'], item['salary3'], item['spent12'], item['spent3'],
+              item['salaryDirector'], item['salarySupervizer'], item['salaryTraficman'], item['plus12'], item['plus3'], item['total'],
+              item['id']))
+    conn.commit()
+    conn.close()
 
-            if recalculated_data:
-                cursor.execute("""
-                    UPDATE salary_data
-                    SET salary12 = ?, salary3 = ?, nalog12 = ?, nalog3 = ?, spent12 = ?, spent3 = ?,
-                        money12 = ?, money3 = ?, salaryDirector = ?, salarySupervizer = ?, salaryTraficman = ?,
-                        totalOfDay = ?
-                    WHERE id = ?
-                """, (recalculated_data['salary12'], recalculated_data['salary3'], recalculated_data['nalog12'],
-                      recalculated_data['nalog3'], recalculated_data['spent12'], recalculated_data['spent3'],
-                      recalculated_data['money12'], recalculated_data['money3'], recalculated_data['salaryDirector'],
-                      recalculated_data['salarySupervizer'], recalculated_data['salaryTraficman'],
-                      recalculated_data['totalOfDay'], data['id']))
+# Helper function to get the salary table from the database
+def get_salary_table_from_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT ladder, director, supervisor, traffic_man FROM salary_table")
+    rows = cursor.fetchall()
+    conn.close()
 
-        conn.commit()
-        print("All data recalculated successfully!")
+    # Преобразуем данные в словарь, как требуется для vlookup
+    table = {}
+    for row in rows:
+        table[row['ladder']] = {
+            'director': row['director'],
+            'supervisor': row['supervisor'],
+            'traffic_man': row['traffic_man']
+        }
+    return table
 
-    except Exception as e:
-        print(f"Error recalculating all data: {e}")
-    finally:
-        conn.close()
-
-@app.route('/api/data', methods=['POST'])
-def add_data():
-    data = request.get_json()
-    try:
-        date_str = data['date']
-        date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
-        day_of_week = date_obj.weekday()
-
-        if day_of_week in [5, 6]:
-            isWorkDay = 0
-        else:
-            isWorkDay = int(data['isWorkDay'])
-
-        office = data['office'] if isWorkDay else 0
-        oklad = data['oklad'] if isWorkDay else 0
-
-        data['isWorkDay'] = isWorkDay
-        data['office'] = office
-        data['oklad'] = oklad
-
-        grid = load_grid() # Load the grid
-        calculated_data = calculate_data(data, grid) # Pass the grid
-        data.update(calculated_data)
+# API endpoints
+@app.route('/api/table', methods=['GET', 'POST'])
+def handle_table():
+    if request.method == 'GET':
+        table = get_salary_table_from_db()
+        return jsonify(table)
+    elif request.method == 'POST':
+        table_data = request.get_json()
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO salary_data (date, summHold12, summHold3, isWorkDay, office, oklad, robot, aproov,
-                salary12, salary3, nalog12, nalog3, spent12, spent3, money12, money3,
-                salaryDirector, salarySupervizer, salaryTraficman, totalOfDay)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (data['date'], data['summHold12'], data['summHold3'], data['isWorkDay'], data['office'],
-              data['oklad'], data['robot'], data['aproov'], data['salary12'], data['salary3'],
-              data['nalog12'], data['nalog3'], data['spent12'], data['spent3'], data['money12'],
-              data['money3'], data['salaryDirector'], data['salarySupervizer'], data['salaryTraficman'],
-              data['totalOfDay']))
+
+        # Удаляем старые значения из базы данных
+        cursor.execute("DELETE FROM salary_table")
+
+        # Записываем новые значения
+        for ladder, values in table_data.items():
+            cursor.execute("""
+                INSERT INTO salary_table (ladder, director, supervisor, traffic_man)
+                VALUES (?, ?, ?, ?)
+            """, (int(ladder), values["director"], values["supervisor"], values["traffic_man"]))
+
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Data added successfully!'}), 201
 
-    except Exception as e:
-        print(f"Error adding data: {e}")
-        return jsonify({'error': str(e)}), 500
+        recalculate_all_data()
+        return jsonify({'message': 'Table updated'}), 200
 
-@app.route('/api/data/<int:id>', methods=['PUT'])
-def update_data(id):
-    data = request.get_json()
-    try:
-        date_str = data['date']
-        date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
-        day_of_week = date_obj.weekday()
+@app.route('/api/data', methods=['GET', 'POST'])
+def handle_data():
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-        if day_of_week in [5, 6]:
-            isWorkDay = 0
-        else:
-            isWorkDay = int(data['isWorkDay'])
+    if request.method == 'GET':
+        cursor.execute("SELECT * FROM data")
+        rows = cursor.fetchall()
+        data = [dict(row) for row in rows]
+        conn.close()
+        return jsonify(data)
+    elif request.method == 'POST':
+        new_data_item = request.get_json()
+        new_data_item = calculate_data(new_data_item)
 
-        office = data['office'] if isWorkDay else 0
-        oklad = data['oklad'] if isWorkDay else 0
-
-        data['isWorkDay'] = isWorkDay
-        data['office'] = office
-        data['oklad'] = oklad
-
-        grid = load_grid() # Load the grid
-        calculated_data = calculate_data(data, grid)  # Pass the grid
-        data.update(calculated_data)
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
         cursor.execute("""
-            UPDATE salary_data
-            SET date = ?, summHold12 = ?, summHold3 = ?, isWorkDay = ?, office = ?, oklad = ?, robot = ?, aproov = ?,
-                salary12 = ?, salary3 = ?, nalog12 = ?, nalog3 = ?, spent12 = ?, spent3 = ?, money12 = ?, money3 = ?,
-                salaryDirector = ?, salarySupervizer = ?, salaryTraficman = ?, totalOfDay = ?
-            WHERE id = ?
-        """, (data['date'], data['summHold12'], data['summHold3'], data['isWorkDay'], data['office'],
-              data['oklad'], data['robot'], data['aproov'], data['salary12'], data['salary3'],
-              data['nalog12'], data['nalog3'], data['spent12'], data['spent3'], data['money12'],
-              data['money3'], data['salaryDirector'], data['salarySupervizer'], data['salaryTraficman'],
-              data['totalOfDay'], id))
+            INSERT INTO data (date, sumHold12, sumHold3, robot, oklad, office, aproov,
+                nalog12, nalog3, salary12, salary3, spent12, spent3,
+                salaryDirector, salarySupervizer, salaryTraficman, plus12, plus3, total)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (new_data_item['date'], new_data_item['sumHold12'], new_data_item['sumHold3'],
+              new_data_item['robot'], new_data_item['oklad'], new_data_item['office'], new_data_item['aproov'],
+              new_data_item['nalog12'], new_data_item['nalog3'], new_data_item['salary12'], new_data_item['salary3'],
+              new_data_item['spent12'], new_data_item['spent3'], new_data_item['salaryDirector'],
+              new_data_item['salarySupervizer'], new_data_item['salaryTraficman'], new_data_item['plus12'],
+              new_data_item['plus3'], new_data_item['total']))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Data updated successfully!'})
+        return jsonify({'message': 'Data added'}), 201
 
-    except Exception as e:
-        print(f"Error updating data: {e}")
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/data', methods=['GET'])
-def get_all_data():
+@app.route('/api/data/<int:data_id>', methods=['GET', 'PUT', 'DELETE'])
+def handle_data_item(data_id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT * FROM salary_data")
-        data = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM data WHERE id=?", (data_id,))
+    row = cursor.fetchone()
+    if not row:
         conn.close()
-        return jsonify([dict(row) for row in data])
-    except Exception as e:
-        print(f"Error getting all data: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': 'Invalid data ID'}), 400
+    data_item = dict(row)
 
-@app.route('/api/data/<int:id>', methods=['GET'])
-def get_data(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT * FROM salary_data WHERE id = ?", (id,))
-        data = cursor.fetchone()
+    if request.method == 'GET':
         conn.close()
+        return jsonify(data_item)
+    elif request.method == 'PUT':
+        updated_item = request.get_json()
+        updated_item = calculate_data(updated_item)
 
-        if data:
-            return jsonify(dict(data))
-        return jsonify({'message': 'Data not found'}), 404
-    except Exception as e:
-        print(f"Error getting data: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/data/<int:id>', methods=['DELETE'])
-def delete_data(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("DELETE FROM salary_data WHERE id = ?", (id,))
+        cursor.execute("""
+            UPDATE data SET
+                date=?, sumHold12=?, sumHold3=?, robot=?, oklad=?, office=?, aproov=?,
+                nalog12=?, nalog3=?, salary12=?, salary3=?, spent12=?, spent3=?,
+                salaryDirector=?, salarySupervizer=?, salaryTraficman=?, plus12=?, plus3=?, total=?
+            WHERE id=?
+        """, (updated_item['date'], updated_item['sumHold12'], updated_item['sumHold3'],
+              updated_item['robot'], updated_item['oklad'], updated_item['office'], updated_item['aproov'],
+              updated_item['nalog12'], updated_item['nalog3'], updated_item['salary12'], updated_item['salary3'],
+              updated_item['spent12'], updated_item['spent3'], updated_item['salaryDirector'],
+              updated_item['salarySupervizer'], updated_item['salaryTraficman'], updated_item['plus12'],
+              updated_item['plus3'], updated_item['total'], data_id))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Data deleted successfully!'})
-    except Exception as e:
-        print(f"Error deleting data: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'message': 'Data updated'}), 200
+    elif request.method == 'DELETE':
+        cursor.execute("DELETE FROM data WHERE id=?", (data_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Data deleted'}), 200
 
-@app.route('/api/data/summary/month', methods=['GET'])
-def get_monthly_summary():
+@app.route('/api/data/grouped/monthly', methods=['GET'])
+def get_monthly_data():
     conn = get_db_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            SELECT strftime('%Y-%m', date) AS month, SUM(totalOfDay) AS totalOfDay
-            FROM salary_data
-            GROUP BY strftime('%Y-%m', date)
-        """)
-        data = cursor.fetchall()
-        conn.close()
-        return jsonify([dict(row) for row in data])
-    except Exception as e:
-        print(f"Error fetching monthly summary: {e}")
-        return jsonify({'error': str(e)}), 500
+    cursor.execute("""
+        SELECT strftime('%Y-%m', date) as month, SUM(total) as total 
+        FROM data 
+        GROUP BY month
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    monthly_data = {row['month']: {'total': row['total']} for row in rows}
+    return jsonify(monthly_data)
 
-@app.route('/api/data/summary/year', methods=['GET'])
-def get_yearly_summary():
+@app.route('/api/data/grouped/yearly', methods=['GET'])
+def get_yearly_data():
     conn = get_db_connection()
     cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            SELECT strftime('%Y', date) AS year, SUM(totalOfDay) AS totalOfDay
-            FROM salary_data
-            GROUP BY strftime('%Y', date)
-        """)
-        data = cursor.fetchall()
-        conn.close()
-        return jsonify([dict(row) for row in data])
-    except Exception as e:
-        print(f"Error fetching yearly summary: {e}")
-        return jsonify({'error': str(e)}), 500
+    cursor.execute("""
+        SELECT strftime('%Y', date) as year, SUM(total) as total 
+        FROM data 
+        GROUP BY year
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    yearly_data = {row['year']: {'total': row['total']} for row in rows}
+    return jsonify(yearly_data)
 
 if __name__ == '__main__':
+    init_db()
+    init_table_db()
     app.run(debug=True)

@@ -18,6 +18,11 @@ table = {
 	300000	17650	14850	11250
 }
 
+retable = {
+	vue.js + bootstrap4 таблица из инпутов для изменения значения table 
+	при изменение этой table должны меняться все значения в table и data в зависимости от изменения 
+}
+
 data = {
 	date: String (if date == saturday or date == sunday => isWordDay = false),
 	summHold12: int,
@@ -51,4 +56,26 @@ dataYear = {
 	groupByMounth(mounth) {
 		// групировать данные по году (итого totalOfDataMounth) 
 	}
+}
+
+computed = {
+	aproov: float (0.6 = const) 
+	date: string (input)
+	robot: integer (input)
+	sumHold12: integer (input)
+	sumHold3: integer (input)
+	oklad: integer (input)
+	office: integer (input)
+	nalog12: integer = (sumHold12 * 10 * aproov * 0.07)
+	nalog3: integer = (sumHold * 10 * aproov * 0.07)
+	salary12: integer = 0.37 * (sumHold12 * aproov) / 0.63 + sumHold12 * aproov
+	salary3: integer = 0.37 * (sumHold3 * aproov) / 0.63 + sumHold3 * aproov
+	sent12: integer = (robot / 2) + oklad + nalog12 + salary12
+	sent3: integer = (robot / 2) + office + nalog3 + salary3
+	salaryDirector: integer = VLOCUP(money3 + money12 - spent12 - spent3, table)
+	salarySupervizer: integer = VLOCUP(money3 - spent3, table)
+	salaryTraficman: integer = VLOCAP(money12- spent12, table)
+	plus12: integer = sumHold12 * aproov * 10
+	plus3: integer = sumHold3 * aproov * 10
+	total: integer = plus12 + plus3 - salaryDirector - salarySupervizer - salaryTraficman - sent12 - sent3
 }
