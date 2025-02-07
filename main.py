@@ -107,7 +107,6 @@ def vlookup(value, table, column):
             return next((row[column] for row in table if row['ladder'] == keys[i]), 0)
     return next((row[column] for row in table if row['ladder'] == keys[-1]), 0)
 
-
 def calculate_data(item):
     """Вычисляет значения для элемента данных."""
     try:
@@ -133,9 +132,27 @@ def calculate_data(item):
         # Получаем таблицу из базы данных
         table = get_salary_table_from_db()
 
-        salaryDirector = int(vlookup(plus3 + plus12 - spent12 - spent3, table, 'director'))
-        salarySupervizer = int(vlookup(plus3 - spent3, table, 'supervisor'))
-        salaryTraficman = int(vlookup(plus12 - spent12, table, 'traffic_man'))
+        # Новая логика расчета зарплаты
+        money12 = plus12  # Исправлено
+        money3 = plus3    # Исправлено
+
+        salarySupervizer = 0 if money12 == 0 else (
+            vlookup(money12 - spent12, table, 'supervisor')
+            if (money12 - spent12) > 20000
+            else 2100
+        )
+
+        salaryTraficman = 0 if (money12 + money3) == 0 else (
+            vlookup((money12 - spent12) + (money3 - spent3), table, 'traffic_man')
+            if ((money12 - spent12) + (money3 - spent3)) > 20000
+            else 1400
+        )
+
+        salaryDirector = 0 if money3 == 0 else (
+            vlookup(money3 - spent3 + 20000, table, 'director')
+            if (money3 - spent3) > 20000
+            else 3000
+        )
 
         total = int(plus12 + plus3 - salaryDirector - salarySupervizer - salaryTraficman - spent12 - spent3)
 
