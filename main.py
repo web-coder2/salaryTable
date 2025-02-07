@@ -3,14 +3,16 @@ from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import datetime
-import os  # Импортируем модуль os
+import os
+from datetime import date
 
-app = Flask(__name__, static_folder='.') # Указываем текущую папку для статики
+app = Flask(__name__)
 CORS(app)
 
 DATABASE = 'data.db'
 DEFAULT_APROOV = 0.6
 
+# --- Database Helper Functions ---
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
@@ -48,16 +50,6 @@ def init_db():
                 total INTEGER
             )
         """)
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"Database error: {e}")
-    finally:
-        close_db_connection(conn)
-
-def init_table_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS salary_table (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -100,18 +92,21 @@ def init_table_db():
                 except sqlite3.IntegrityError:
                     print(f"Ladder {ladder} already exists in salary_table")
                     conn.rollback()
+        conn.commit()  # Commit after creating the table
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     finally:
         close_db_connection(conn)
 
+# --- Calculation and Lookup Functions ---
 def vlookup(value, table, column):
     """Имитация функции VLOOKUP."""
-    keys = sorted(table.keys())
+    keys = sorted([row['ladder'] for row in table])
     for i in range(len(keys) - 1):
         if value >= keys[i] and value < keys[i + 1]:
-            return table[keys[i]][column]
-    return table[keys[-1]][column]
+            return next((row[column] for row in table if row['ladder'] == keys[i]), 0)
+    return next((row[column] for row in table if row['ladder'] == keys[-1]), 0)
+
 
 def calculate_data(item):
     """Вычисляет значения для элемента данных."""
@@ -166,7 +161,7 @@ def calculate_data(item):
         return item
     except Exception as e:
         print(f"Calculation error: {e}")
-        return None  # Возвращаем None в случае ошибки
+        return None
 
 def recalculate_all_data():
     """Пересчитывает все записи данных с использованием текущей таблицы."""
@@ -201,61 +196,20 @@ def recalculate_all_data():
     finally:
         close_db_connection(conn)
 
-# Helper function to get the salary table from the database
 def get_salary_table_from_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT ladder, director, supervisor, traffic_man FROM salary_table")
+        cursor.execute("SELECT ladder, director, supervisor, traffic_man, id FROM salary_table")
         rows = cursor.fetchall()
-
-        # Преобразуем данные в словарь, как требуется для vlookup
-        table = {}
-        for row in rows:
-            table[row['ladder']] = {
-                'director': row['director'],
-                'supervisor': row['supervisor'],
-                'traffic_man': row['traffic_man']
-            }
-        return table
+        return [dict(row) for row in rows]
     except sqlite3.Error as e:
         print(f"Database error while fetching salary table: {e}")
-        return {}
+        return []
     finally:
         close_db_connection(conn)
 
-# API endpoints
-@app.route('/api/table', methods=['GET', 'POST'])
-def handle_table():
-    if request.method == 'GET':
-        table = get_salary_table_from_db()
-        return jsonify(table)
-    elif request.method == 'POST':
-        table_data = request.get_json()
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        try:
-            # Удаляем старые значения из базы данных
-            cursor.execute("DELETE FROM salary_table")
-
-            # Записываем новые значения
-            for ladder, values in table_data.items():
-                cursor.execute("""
-                    INSERT INTO salary_table (ladder, director, supervisor, traffic_man)
-                    VALUES (?, ?, ?, ?)
-                """, (int(ladder), values["director"], values["supervisor"], values["traffic_man"]))
-
-            conn.commit()
-            recalculate_all_data()
-            return jsonify({'message': 'Table updated'}), 200
-        except sqlite3.Error as e:
-            conn.rollback()
-            print(f"Database error during table update: {e}")
-            return jsonify({'error': 'Failed to update table'}), 500
-        finally:
-            close_db_connection(conn)
-
+# --- API Endpoints ---
 @app.route('/api/data', methods=['GET', 'POST'])
 def handle_data():
     conn = get_db_connection()
@@ -299,7 +253,6 @@ def handle_data():
                 close_db_connection(conn)
         else:
             return jsonify({'error': 'Failed to calculate data'}), 400
-
 
 @app.route('/api/data/<int:data_id>', methods=['GET', 'PUT', 'DELETE'])
 def handle_data_item(data_id):
@@ -385,17 +338,57 @@ def get_yearly_data():
     finally:
         close_db_connection(conn)
 
-# Маршрут для обслуживания статических файлов
-@app.route('/<path:path>')
-def send_static(path):
-    return send_from_directory('.', path)
+@app.route('/api/table', methods=['GET', 'POST'])
+def handle_table():
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-# Маршрут для главной страницы
+    if request.method == 'GET':
+        try:
+            cursor.execute("SELECT ladder, director, supervisor, traffic_man, id FROM salary_table")
+            rows = cursor.fetchall()
+            # Преобразуем данные в список объектов
+            table = [dict(row) for row in rows]
+            return jsonify(table)
+        except sqlite3.Error as e:
+            print(f"Database error during salary_table retrieval: {e}")
+            return jsonify({'error': 'Failed to retrieve salary table'}), 500
+        finally:
+            close_db_connection(conn)
+
+    elif request.method == 'POST':
+        table_data = request.get_json()
+
+        try:
+            # Удаляем старые значения из базы данных
+            cursor.execute("DELETE FROM salary_table")
+
+            # Записываем новые значения
+            for item in table_data:
+                cursor.execute("""
+                    INSERT INTO salary_table (ladder, director, supervisor, traffic_man)
+                    VALUES (?, ?, ?, ?)
+                """, (item['ladder'], item['director'], item['supervisor'], item['traffic_man']))
+
+            conn.commit()
+            recalculate_all_data()
+            return jsonify({'message': 'Table updated'}), 200
+        except sqlite3.Error as e:
+            conn.rollback()
+            print(f"Database error during table update: {e}")
+            return jsonify({'error': 'Failed to update table'}), 500
+        finally:
+            close_db_connection(conn)
+
+# --- Static Files and Index Route ---
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
 
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory('.', path)
+
 if __name__ == '__main__':
     init_db()
-    init_table_db()
     app.run(debug=True)

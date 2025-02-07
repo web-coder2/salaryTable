@@ -8,10 +8,10 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body>
+<body style="background-color: #f0f0f0;">
 
 <div id="app" class="container">
-    <h1>Статистика доходов</h1>
+    <h1 style="color: #333;">Статистика доходов</h1>
     <h4 class="mt-5 mb-3">Добавить запись</h4>
     <form @submit.prevent="addData">
         <div class="form-group">
@@ -38,7 +38,7 @@
             <label>Офис:</label>
             <input type="number" class="form-control" v-model="newEntry.office" required>
         </div>
-        <button type="submit" class="btn btn-primary">Сохранить запись</button>
+        <button type="submit" class="btn btn-primary" style="border-radius: 5px;">Сохранить запись</button>
     </form>
     <h2>Список записей</h2>
     <div class="table-responsive">
@@ -68,7 +68,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item, index) in data" :key="index">
+            <tr v-for=" (item, index) in data" :key="item.id">
                 <td>{{ item.date }}</td>
                 <td>{{ item.sumHold12 }}</td>
                 <td>{{ item.sumHold3 }}</td>
@@ -90,7 +90,7 @@
                 <td>{{ item.total }}</td>
                 <td>
                     <div style="display: flex; flex-direction: column;">
-                        <button @click="deleteData(index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
+                        <button @click="deleteData(item.id, index)" class="btn btn-danger btn-sm delete-button" style="border-radius: 5px;">Удалить</button>
                     </div>
                 </td>
             </tr>
@@ -98,10 +98,10 @@
         </table>
     </div>
 
-    <button @click="toggleMonthlyData" class="btn btn-info">
+    <button @click="toggleMonthlyData" class="btn btn-info" style="border-radius: 5px;">
         {{ showMonthlyData ? 'скрыть за месяц' : 'показать за месяц' }}
     </button>
-    <button @click="toggleYearlyData" class="btn btn-info">
+    <button @click="toggleYearlyData" class="btn btn-info" style="border-radius: 5px;">
         {{ showYearlyData ? 'скрыть за год' : 'показать за год' }}
     </button>
 
@@ -142,7 +142,7 @@
     </div>
 
     <h2>Редактировать таблицу</h2>
-    <table class="table table-bordered" v-if="Object.keys(table).length > 0">
+    <table class="table table-bordered" v-if="table.length > 0">
         <thead>
         <tr>
             <th>Лестница</th>
@@ -152,15 +152,24 @@
         </tr>
         </thead>
         <tbody>
-            <tr v-for="(key, index) in tableKeys" :key="index">
-                <td><input type="number" class="table-input form-control" v-model.number="tableKeys[index].value"></td>
-                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].director"></td>
-                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].supervisor"></td>
-                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].traffic_man"></td>
-            </tr>
+        <tr v-for="item in table" :key="item.id">
+            <td>
+                <input type="number" class="table-input form-control" v-model.number="item.ladder">
+            </td>
+            <td>
+                <input type="number" class="table-input form-control" v-model.number="item.director">
+            </td>
+            <td>
+                <input type="number" class="table-input form-control" v-model.number="item.supervisor">
+            </td>
+            <td>
+                <input type="number" class="table-input form-control" v-model.number="item.traffic_man">
+            </td>
+        </tr>
         </tbody>
     </table>
-    <button @click="saveTable" class="btn btn-success">Сохранить таблицу</button>
+
+    <button @click="saveTable" class="btn btn-success" style="border-radius: 5px;">Сохранить таблицу</button>
 </div>
 
 <script src="script.js"></script>
