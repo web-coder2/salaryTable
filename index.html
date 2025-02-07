@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Финансовый учет</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Salary CRM</title>
+    <!-- Убрали ссылку на Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
@@ -29,6 +29,27 @@
 
         .btn-primary, .btn-success, .btn-info, .btn-danger {
             margin-top: 10px;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
         }
 
         .table-responsive {
@@ -36,7 +57,11 @@
         }
 
         .table-input {
-            width: 120px; /* Увеличена ширина инпутов */
+            width: 200px; /* Увеличена ширина инпутов */
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
         .entry-table td, .entry-table th {
@@ -47,6 +72,20 @@
         .edit-button, .delete-button {
             width: 120px;
             margin-bottom: 5px; /* Добавлен отступ снизу */
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
         }
 
         .edit-form {
@@ -56,15 +95,89 @@
             border-radius: 5px;
             background-color: #ffffff;
         }
+
+        /* Формы */
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 0.75rem;
+                        font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            color: #495057;
+            background-color: #fff;
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        /* Таблица */
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+
+        .table-bordered th,
+        .table-bordered td {
+            border: 1px solid #dee2e6;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .table-input {
+                width: 100%;
+            }
+
+            .edit-button,
+            .delete-button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div id="app" class="container">
 
-    <h1>Финансовый учет</h1>
+    <h1>Статистика доходов</h1>
 
-    <h2>Добавить запись</h2>
+    <h4 class="mt-5 mb-3">Добавить запись</h4>
     <form @submit.prevent="addData">
         <div class="form-group">
             <label>Дата:</label>
@@ -72,23 +185,23 @@
         </div>
         <div class="form-group">
             <label>Сумма Холдов 12:</label>
-            <input type="number" class="form-control" v-model.number="newEntry.sumHold12" required>
+            <input type="number" class="form-control" v-model="newEntry.sumHold12" required>
         </div>
         <div class="form-group">
             <label>Сумма Холдов 3:</label>
-            <input type="number" class="form-control" v-model.number="newEntry.sumHold3" required>
+            <input type="number" class="form-control" v-model="newEntry.sumHold3" required>
         </div>
         <div class="form-group">
             <label>Робот:</label>
-            <input type="number" class="form-control" v-model.number="newEntry.robot" required>
+            <input type="number" class="form-control" v-model="newEntry.robot" required>
         </div>
         <div class="form-group">
             <label>Оклад:</label>
-                        <input type="number" class="form-control" v-model.number="newEntry.oklad" required>
+            <input type="number" class="form-control" v-model="newEntry.oklad" required>
         </div>
         <div class="form-group">
             <label>Офис:</label>
-            <input type="number" class="form-control" v-model.number="newEntry.office" required>
+            <input type="number" class="form-control" v-model="newEntry.office" required>
         </div>
         <button type="submit" class="btn btn-primary">Сохранить запись</button>
     </form>
@@ -143,9 +256,6 @@
                 <td>{{ item.total }}</td>
                 <td>
                     <div style="display: flex; flex-direction: column;">
-                        <button @click="editEntry(index)" class="btn btn-secondary btn-sm edit-button">
-                            {{ editingIndex === index ? 'Скрыть' : 'Редактировать' }}
-                        </button>
                         <button @click="deleteData(index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
                     </div>
                 </td>
@@ -154,39 +264,12 @@
         </table>
     </div>
 
-    <div v-if="editingIndex !== null" class="edit-form">
-        <h2>Редактировать запись</h2>
-        <form @submit.prevent="updateData">
-            <div class="form-group">
-                <label>Дата:</label>
-                <input type="date" class="form-control" v-model="editedEntry.date" required>
-            </div>
-            <div class="form-group">
-                <label>Сумма Холдов 12:</label>
-                <input type="number" class="form-control" v-model.number="editedEntry.sumHold12" required>
-            </div>
-            <div class="form-group">
-                <label>Сумма Холдов 3:</label>
-                <input type="number" class="form-control" v-model.number="editedEntry.sumHold3" required>
-            </div>
-            <div class="form-group">
-                <label>Робот:</label>
-                <input type="number" class="form-control" v-model.number="editedEntry.robot" required>
-            </div>
-            <div class="form-group">
-                <label>Оклад:</label>
-                <input type="number" class="form-control" v-model.number="editedEntry.oklad" required>
-            </div>
-            <div class="form-group">
-                <label>Офис:</label>
-                <input type="number" class="form-control" v-model.number="editedEntry.office" required>
-            </div>
-            <button type="submit" class="btn btn-success">Сохранить изменения</button>
-        </form>
-    </div>
-
-    <button @click="toggleMonthlyData" class="btn btn-info">Показать/Скрыть месячные данные</button>
-    <button @click="toggleYearlyData" class="btn btn-info">Показать/Скрыть годовые данные</button>
+    <button @click="toggleMonthlyData" class="btn btn-info">
+        {{ showMonthlyData ? 'скрыть за месяц' : 'показать за месяц' }}
+    </button>
+    <button @click="toggleYearlyData" class="btn btn-info">
+        {{ showYearlyData ? 'скрыть за год' : 'показать за год' }}
+    </button>
 
     <div v-if="showMonthlyData">
         <h2>Сгруппированные данные по месяцам</h2>
@@ -235,16 +318,18 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(row, key) in tableKeys" :key="key">
-        <td><input type="number" class="table-input form-control" v-model.number="row"></td>
-        <td><input type="number" class="table-input form-control" v-model.number="table[row]['director']"></td>
-        <td><input type="number" class="table-input form-control" v-model.number="table[row]['supervisor']"></td>
-        <td><input type="number" class="table-input form-control" v-model.number="table[row]['traffic_man']"></td>
-        </tr> <!--ladder table[row]['ladder']-->
+        <tr v-for="(key, index) in tableKeys" :key="index">
+            <td><input type="number" class="table-input form-control" v-model.number="key"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['director']"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['supervizor']"></td>
+            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['traffic-man']"></td>
+        </tr>
         </tbody>
     </table>
     <button @click="saveTable" class="btn btn-success">Сохранить таблицу</button>
 </div>
+</body>
+</html>
 
 <script>
     new Vue({
@@ -272,13 +357,10 @@
             monthlyData: {},
             yearlyData: {},
             showMonthlyData: false,
-            showYearlyData: false
+            showYearlyData: false,
+            tableKeys: [] // Изменили на массив объектов
         },
-        computed: {
-            tableKeys() {
-                return Object.keys(this.table).sort((a, b) => a - b);
-            }
-        },
+        computed: {},
         mounted() {
             this.fetchData();
             this.fetchTable();
@@ -316,15 +398,6 @@
                     console.error('Ошибка при удалении данных:', error);
                 }
             },
-            editEntry(index) {
-                if (this.editingIndex === index) {
-                    this.editingIndex = null; // Скрыть форму
-                } else {
-                    this.editingIndex = index;
-                    // Клонируем данные для редактирования
-                    this.editedEntry = { ...this.data[index] };
-                }
-            },
             async updateData() {
                 try {
                     await axios.put(`http://localhost:5000/api/data/${this.editingIndex}`, this.editedEntry);
@@ -338,13 +411,21 @@
                 try {
                     const response = await axios.get('http://localhost:5000/api/table');
                     this.table = response.data;
+
+                    // Преобразуем ключи в массив объектов
+                    this.tableKeys = Object.keys(this.table).sort((a, b) => a - b).map(key => ({value: key}));
                 } catch (error) {
                     console.error('Ошибка при загрузке таблицы:', error);
                 }
             },
             async saveTable() {
                 try {
-                    await axios.post('http://localhost:5000/api/table', this.table);
+                    const newTable = {};
+                    this.tableKeys.forEach(item => {
+                        newTable[item.value] = this.table[item.value];
+                    });
+
+                    await axios.post('http://localhost:5000/api/table', newTable);
                     alert('Таблица сохранена!');
                     await this.fetchData();
                 } catch (error) {
@@ -376,6 +457,3 @@
         }
     })
 </script>
-
-</body>
-</html>

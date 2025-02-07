@@ -1,4 +1,3 @@
-
 from flask import Flask, jsonify, request
 import datetime
 from flask_cors import CORS
@@ -276,7 +275,7 @@ def handle_data_item(data_id):
     if request.method == 'GET':
         conn.close()
         return jsonify(data_item)
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
         updated_item = request.get_json()
         updated_item = calculate_data(updated_item)
 
@@ -295,7 +294,7 @@ def handle_data_item(data_id):
         conn.commit()
         conn.close()
         return jsonify({'message': 'Data updated'}), 200
-    elif request.method == 'DELETE':
+    if request.method == 'DELETE':
         cursor.execute("DELETE FROM data WHERE id=?", (data_id,))
         conn.commit()
         conn.close()
