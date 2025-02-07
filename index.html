@@ -4,179 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salary CRM</title>
-    <!-- Убрали ссылку на Bootstrap -->
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-        }
-
-        h1, h2 {
-            color: #343a40;
-        }
-
-        .container {
-            max-width: 95%;
-            margin: auto;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .btn-primary, .btn-success, .btn-info, .btn-danger {
-            margin-top: 10px;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-        }
-
-        .btn-info {
-            background-color: #17a2b8;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .table-input {
-            width: 200px; /* Увеличена ширина инпутов */
-            padding: 6px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-
-        .entry-table td, .entry-table th {
-            white-space: nowrap;
-            /* Предотвращает перенос текста */
-        }
-
-        .edit-button, .delete-button {
-            width: 120px;
-            margin-bottom: 5px; /* Добавлен отступ снизу */
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .edit-button {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .delete-button {
-            background-color: #dc3545;
-        }
-
-        .edit-form {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-            background-color: #ffffff;
-        }
-
-        /* Формы */
-        .form-control {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 0.75rem;
-                        font-size: 1rem;
-            line-height: 1.5;
-            color: #495057;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-            border-radius: 0.25rem;
-            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-            box-sizing: border-box;
-        }
-
-        .form-control:focus {
-            color: #495057;
-            background-color: #fff;
-            border-color: #80bdff;
-            outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
-        }
-
-        /* Таблица */
-        .table {
-            width: 100%;
-            margin-bottom: 1rem;
-            color: #212529;
-        }
-
-        .table th,
-        .table td {
-            padding: 0.75rem;
-            vertical-align: top;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .table thead th {
-            vertical-align: bottom;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .table-bordered {
-            border: 1px solid #dee2e6;
-        }
-
-        .table-bordered th,
-        .table-bordered td {
-            border: 1px solid #dee2e6;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .container {
-                max-width: 100%;
-                padding: 0 10px;
-            }
-
-            .table-responsive {
-                overflow-x: auto;
-            }
-
-            .table-input {
-                width: 100%;
-            }
-
-            .edit-button,
-            .delete-button {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-        }
-    </style>
 </head>
 <body>
 
 <div id="app" class="container">
-
     <h1>Статистика доходов</h1>
-
     <h4 class="mt-5 mb-3">Добавить запись</h4>
     <form @submit.prevent="addData">
         <div class="form-group">
@@ -205,7 +40,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Сохранить запись</button>
     </form>
-
     <h2>Список записей</h2>
     <div class="table-responsive">
         <table class="table table-bordered entry-table">
@@ -318,142 +152,17 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(key, index) in tableKeys" :key="index">
-            <td><input type="number" class="table-input form-control" v-model.number="key"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['director']"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['supervizor']"></td>
-            <td><input type="number" class="table-input form-control" v-model.number="tableKeys['key']['traffic-man']"></td>
-        </tr>
+            <tr v-for="(key, index) in tableKeys" :key="index">
+                <td><input type="number" class="table-input form-control" v-model.number="tableKeys[index].value"></td>
+                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].director"></td>
+                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].supervisor"></td>
+                <td><input type="number" class="table-input form-control" v-model.number="table[key] && table[key].traffic_man"></td>
+            </tr>
         </tbody>
     </table>
     <button @click="saveTable" class="btn btn-success">Сохранить таблицу</button>
 </div>
+
+<script src="script.js"></script>
 </body>
 </html>
-
-<script>
-    new Vue({
-        el: '#app',
-        data: {
-            table: {},
-            data: [],
-            newEntry: {
-                date: '',
-                sumHold12: 0,
-                sumHold3: 0,
-                robot: 0,
-                oklad: 0,
-                office: 0
-            },
-            editingIndex: null,
-            editedEntry: {
-                date: '',
-                sumHold12: 0,
-                sumHold3: 0,
-                robot: 0,
-                oklad: 0,
-                office: 0
-            },
-            monthlyData: {},
-            yearlyData: {},
-            showMonthlyData: false,
-            showYearlyData: false,
-            tableKeys: [] // Изменили на массив объектов
-        },
-        computed: {},
-        mounted() {
-            this.fetchData();
-            this.fetchTable();
-        },
-        methods: {
-            async fetchData() {
-                try {
-                    const response = await axios.get('http://localhost:5000/api/data');
-                    this.data = response.data;
-                } catch (error) {
-                    console.error('Ошибка при загрузке данных:', error);
-                }
-            },
-            async addData() {
-                try {
-                    await axios.post('http://localhost:5000/api/data', this.newEntry);
-                    this.newEntry = {
-                        date: '',
-                        sumHold12: 0,
-                        sumHold3: 0,
-                        robot: 0,
-                        oklad: 0,
-                        office: 0
-                    };
-                    await this.fetchData();
-                } catch (error) {
-                    console.error('Ошибка при добавлении данных:', error);
-                }
-            },
-            async deleteData(index) {
-                try {
-                    await axios.delete(`http://localhost:5000/api/data/${index}`);
-                    await this.fetchData();
-                } catch (error) {
-                    console.error('Ошибка при удалении данных:', error);
-                }
-            },
-            async updateData() {
-                try {
-                    await axios.put(`http://localhost:5000/api/data/${this.editingIndex}`, this.editedEntry);
-                    await this.fetchData(); // Обновляем таблицу
-                    this.editingIndex = null; // Скрываем форму
-                } catch (error) {
-                    console.error('Ошибка при обновлении данных:', error);
-                }
-            },
-            async fetchTable() {
-                try {
-                    const response = await axios.get('http://localhost:5000/api/table');
-                    this.table = response.data;
-
-                    // Преобразуем ключи в массив объектов
-                    this.tableKeys = Object.keys(this.table).sort((a, b) => a - b).map(key => ({value: key}));
-                } catch (error) {
-                    console.error('Ошибка при загрузке таблицы:', error);
-                }
-            },
-            async saveTable() {
-                try {
-                    const newTable = {};
-                    this.tableKeys.forEach(item => {
-                        newTable[item.value] = this.table[item.value];
-                    });
-
-                    await axios.post('http://localhost:5000/api/table', newTable);
-                    alert('Таблица сохранена!');
-                    await this.fetchData();
-                } catch (error) {
-                    console.error('Ошибка при сохранении таблицы:', error);
-                }
-            },
-            async toggleMonthlyData() {
-                if (!this.showMonthlyData) {
-                    try {
-                        const response = await axios.get('http://localhost:5000/api/data/grouped/monthly');
-                        this.monthlyData = response.data;
-                    } catch (error) {
-                        console.error('Ошибка при загрузке месячных данных:', error);
-                    }
-                }
-                this.showMonthlyData = !this.showMonthlyData;
-            },
-            async toggleYearlyData() {
-                if (!this.showYearlyData) {
-                    try {
-                        const response = await axios.get('http://localhost:5000/api/data/grouped/yearly');
-                        this.yearlyData = response.data;
-                    } catch (error) {
-                        console.error('Ошибка при загрузке годовых данных:', error);
-                    }
-                }
-                this.showYearlyData = !this.showYearlyData;
-            }
-        }
-    })
-</script>
