@@ -1,16 +1,24 @@
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, redirect, url_for, session
 from flask_cors import CORS
 import sqlite3
 import datetime
 import os
 from datetime import date
+import secrets
 
 app = Flask(__name__)
 CORS(app)
 
+# Secret key for sessions
+app.secret_key = secrets.token_hex(16)
+
 DATABASE = 'data.db'
 DEFAULT_APROOV = 0.6
+
+# --- Credentials ---
+LOGIN = "admin"  # Замените на желаемый логин
+PASS = "qwertyuiop123A"  # Замените на желаемый пароль
 
 # --- Database Helper Functions ---
 def get_db_connection():
@@ -226,9 +234,43 @@ def get_salary_table_from_db():
     finally:
         close_db_connection(conn)
 
+# --- Routes ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if username == LOGIN and password == PASS:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            return '''
+            <script>
+                alert("Invalid credentials");
+                window.location.href = "/login";
+            </script>
+            '''
+    return send_from_directory('.', 'login.html')
+
+@app.route('/')
+def index():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    if not session.get('logged_in') and path not in ['login.html', 'style.css', 'script.js']:
+        return redirect(url_for('login'))
+    return send_from_directory('.', path)
+
 # --- API Endpoints ---
 @app.route('/api/data', methods=['GET', 'POST'])
 def handle_data():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -273,6 +315,9 @@ def handle_data():
 
 @app.route('/api/data/<int:data_id>', methods=['GET', 'PUT', 'DELETE'])
 def handle_data_item(data_id):
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -319,6 +364,9 @@ def handle_data_item(data_id):
 
 @app.route('/api/data/grouped/monthly', methods=['GET'])
 def get_monthly_data():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -338,6 +386,9 @@ def get_monthly_data():
 
 @app.route('/api/data/grouped/yearly', methods=['GET'])
 def get_yearly_data():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
@@ -357,6 +408,9 @@ def get_yearly_data():
 
 @app.route('/api/table', methods=['GET', 'POST'])
 def handle_table():
+    if not session.get('logged_in'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -397,14 +451,10 @@ def handle_table():
         finally:
             close_db_connection(conn)
 
-# --- Static Files and Index Route ---
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:path>')
-def serve_static(path):
-    return send_from_directory('.', path)
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     init_db()

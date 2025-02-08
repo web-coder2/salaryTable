@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="background-color: #f0f0f0;">
+
+<div class="container" style="max-width: 400px; margin-top: 100px;">
+    <h2 style="color: #333; text-align: center;">Вход</h2>
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label for="username">Логин:</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Войти</button>
+    </form>
+</div>
+
+</body>
+</html>

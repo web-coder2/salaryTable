@@ -1,7 +1,7 @@
 new Vue({
     el: '#app',
     data: {
-        table: [], // Changed to an array of objects
+        table: [],
         data: [],
         newEntry: {
             date: '',
@@ -14,7 +14,8 @@ new Vue({
         monthlyData: {},
         yearlyData: {},
         showMonthlyData: false,
-        showYearlyData: false
+        showYearlyData: false,
+        showTable: true  // Новая переменная для управления видимостью таблицы
     },
     computed: {},
     mounted() {
@@ -49,8 +50,8 @@ new Vue({
         async deleteData(itemId, index) {
             try {
                 await axios.delete(`/api/data/${itemId}`);
-                this.data.splice(index, 1); // Remove from frontend array
-                this.fetchData(); // Refresh data
+                this.data.splice(index, 1);
+                this.fetchData();
             } catch (error) {
                 console.error('Ошибка при удалении данных:', error);
             }
@@ -92,6 +93,9 @@ new Vue({
                 }
             }
             this.showYearlyData = !this.showYearlyData;
+        },
+        toggleTable() {
+            this.showTable = !this.showTable;  // Изменяем видимость таблицы
         }
     }
 });

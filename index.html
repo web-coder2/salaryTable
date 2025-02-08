@@ -11,9 +11,15 @@
 <body style="background-color: #f0f0f0;">
 
 <div id="app" class="container">
-    <h1 style="color: #333;">Статистика доходов</h1>
-    <h4 class="mt-5 mb-3">Добавить запись</h4>
-    <form @submit.prevent="addData">
+    <!-- Logout link and title -->
+    <div class="header-section">
+        <h1 class="main-title">Статистика доходов</h1>
+        <a href="/logout" class="logout-link">Выйти</a>
+    </div>
+
+    <!-- Add entry form -->
+    <h4 class="form-title">Добавить запись</h4>
+    <form @submit.prevent="addData" class="data-form">
         <div class="form-group">
             <label>Дата:</label>
             <input type="date" class="form-control" v-model="newEntry.date" required>
@@ -38,74 +44,87 @@
             <label>Офис:</label>
             <input type="number" class="form-control" v-model="newEntry.office" required>
         </div>
-        <button type="submit" class="btn btn-primary" style="border-radius: 5px;">Сохранить запись</button>
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Сохранить запись</button>
+            <button @click="toggleTable" class="btn btn-info">
+                {{ showTable ? 'Скрыть таблицу' : 'Показать таблицу' }}
+            </button>
+        </div>
     </form>
-    <h2>Список записей</h2>
-    <div class="table-responsive">
-        <table class="table table-bordered entry-table">
-            <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Сумма 12</th>
-                <th>Сумма 3</th>
-                <th>Робот</th>
-                <th>Оклад</th>
-                <th>Офис</th>
-                <th>Aproov</th>
-                <th>Зарплата 12</th>
-                <th>Зарплата 3</th>
-                <th>Налог 12</th>
-                <th>Налог 3</th>
-                <th>Потрачено 12</th>
-                <th>Потрачено 3</th>
-                <th>Деньги 12</th>
-                <th>Деньги 3</th>
-                <th>Зарплата Директора</th>
-                <th>Зарплата Супервайзера</th>
-                <th>Зарплата Трафик-мена</th>
-                <th>Итого</th>
-                <th style="width: 250px;">Действия</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for=" (item, index) in data" :key="item.id">
-                <td>{{ item.date }}</td>
-                <td>{{ item.sumHold12 }}</td>
-                <td>{{ item.sumHold3 }}</td>
-                <td>{{ item.robot }}</td>
-                <td>{{ item.oklad }}</td>
-                <td>{{ item.office }}</td>
-                <td>{{ item.aproov }}</td>
-                <td>{{ item.salary12 }}</td>
-                <td>{{ item.salary3 }}</td>
-                <td>{{ item.nalog12 }}</td>
-                <td>{{ item.nalog3 }}</td>
-                <td>{{ item.spent12 }}</td>
-                <td>{{ item.spent3 }}</td>
-                <td>{{ item.plus12 }}</td>
-                <td>{{ item.plus3 }}</td>
-                <td>{{ item.salaryDirector }}</td>
-                <td>{{ item.salarySupervizer }}</td>
-                <td>{{ item.salaryTraficman }}</td>
-                <td>{{ item.total }}</td>
-                <td>
-                    <div style="display: flex; flex-direction: column;">
-                        <button @click="deleteData(item.id, index)" class="btn btn-danger btn-sm delete-button" style="border-radius: 5px;">Удалить</button>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+
+    <!-- Data table -->
+    <div v-if="showTable" class="data-table-section">
+        <h2>Список записей</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered entry-table">
+                <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Сумма 12</th>
+                    <th>Сумма 3</th>
+                    <th>Робот</th>
+                    <th>Оклад</th>
+                    <th>Офис</th>
+                    <th>Aproov</th>
+                    <th>Зарплата 12</th>
+                    <th>Зарплата 3</th>
+                    <th>Налог 12</th>
+                    <th>Налог 3</th>
+                    <th>Потрачено 12</th>
+                    <th>Потрачено 3</th>
+                    <th>Деньги 12</th>
+                    <th>Деньги 3</th>
+                    <th>Зарплата Директора</th>
+                    <th>Зарплата Супервайзера</th>
+                    <th>Зарплата Трафик-мена</th>
+                    <th>Итого</th>
+                    <th class="actions-column">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for=" (item, index) in data" :key="item.id">
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.sumHold12 }}</td>
+                    <td>{{ item.sumHold3 }}</td>
+                    <td>{{ item.robot }}</td>
+                    <td>{{ item.oklad }}</td>
+                    <td>{{ item.office }}</td>
+                    <td>{{ item.aproov }}</td>
+                    <td>{{ item.salary12 }}</td>
+                    <td>{{ item.salary3 }}</td>
+                    <td>{{ item.nalog12 }}</td>
+                    <td>{{ item.nalog3 }}</td>
+                    <td>{{ item.spent12 }}</td>
+                    <td>{{ item.spent3 }}</td>
+                    <td>{{ item.plus12 }}</td>
+                    <td>{{ item.plus3 }}</td>
+                    <td>{{ item.salaryDirector }}</td>
+                    <td>{{ item.salarySupervizer }}</td>
+                    <td>{{ item.salaryTraficman }}</td>
+                    <td>{{ item.total }}</td>
+                    <td>
+                        <div class="actions-group">
+                            <button @click="deleteData(item.id, index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <button @click="toggleMonthlyData" class="btn btn-info" style="border-radius: 5px;">
-        {{ showMonthlyData ? 'скрыть за месяц' : 'показать за месяц' }}
-    </button>
-    <button @click="toggleYearlyData" class="btn btn-info" style="border-radius: 5px;">
-        {{ showYearlyData ? 'скрыть за год' : 'показать за год' }}
-    </button>
+    <!-- Grouped data buttons -->
+    <div class="grouped-data-buttons">
+        <button @click="toggleMonthlyData" class="btn btn-info">
+            {{ showMonthlyData ? 'скрыть за месяц' : 'показать за месяц' }}
+        </button>
+        <button @click="toggleYearlyData" class="btn btn-info">
+            {{ showYearlyData ? 'скрыть за год' : 'показать за год' }}
+        </button>
+    </div>
 
-    <div v-if="showMonthlyData">
+    <!-- Monthly data -->
+    <div v-if="showMonthlyData" class="grouped-data-section">
         <h2>Сгруппированные данные по месяцам</h2>
         <table class="table table-bordered">
             <thead>
@@ -123,7 +142,8 @@
         </table>
     </div>
 
-    <div v-if="showYearlyData">
+    <!-- Yearly data -->
+    <div v-if="showYearlyData" class="grouped-data-section">
         <h2>Сгруппированные данные по годам</h2>
         <table class="table table-bordered">
             <thead>
@@ -137,10 +157,12 @@
                 <td>{{ year }}</td>
                 <td>{{ item.total }}</td>
             </tr>
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
+</div>
 
+<!-- Edit table section -->
+<div class="edit-table-section">
     <h2>Редактировать таблицу</h2>
     <table class="table table-bordered" v-if="table.length > 0">
         <thead>
@@ -166,10 +188,11 @@
                 <input type="number" class="table-input form-control" v-model.number="item.traffic_man">
             </td>
         </tr>
-        </tbody>
-    </table>
+    </tbody>
+</table>
 
-    <button @click="saveTable" class="btn btn-success" style="border-radius: 5px;">Сохранить таблицу</button>
+<button @click="saveTable" class="btn btn-success" style="margin-top: 20px;">Сохранить таблицу</button>
+</div>
 </div>
 
 <script src="script.js"></script>
