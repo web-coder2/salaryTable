@@ -22,7 +22,7 @@
     <form @submit.prevent="addData" class="data-form">
         <div class="form-group">
             <label>Дата:</label>
-            <input type="date" class="form-control" v-model="newEntry.date" required>
+            <input type="date" class="form-control" v-model="newEntry.date" required min="2015-01-01" max="2030-12-31">
         </div>
         <div class="form-group">
             <label>Сумма Холдов 12:</label>
