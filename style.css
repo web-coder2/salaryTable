@@ -139,6 +139,8 @@ input[type="password"] {
     padding: 14px; /* Increased cell padding */
     border: 1px solid #ddd;
     text-align: left;
+    vertical-align: middle; /* Center align text vertically */
+    white-space: nowrap; /* Prevent text from wrapping */
     font-size: 16px; /* Increased table font size */
 }
 
@@ -146,6 +148,11 @@ input[type="password"] {
     background-color: #f2f2f2;
     font-weight: bold;
     color: #555;
+}
+
+.td-entry {
+    font-weight: bold;
+    text-align: right !important;
 }
 
 /* Add colored borders between columns */
@@ -162,106 +169,6 @@ input[type="password"] {
 .table th:last-child,
 .table td:last-child {
   border-right: none; /* Remove the right border for the last column */
-}
-/* Column widths */
-.table th:nth-child(1), /* Дата */
-.table td:nth-child(1) {
-    width: 180px;
-}
-
-.table th:nth-child(2), /* Сумма 12 */
-.table td:nth-child(2) {
-    width: 180px; /* Increased width */
-}
-
-.table th:nth-child(3), /* Сумма 3 */
-.table td:nth-child(3) {
-    width: 180px; /* Increased width */
-}
-
-.table th:nth-child(4), /* Робот */
-.table td:nth-child(4) {
-    width: 150px; /* Increased width */
-}
-
-.table th:nth-child(5), /* Оклад */
-.table td:nth-child(5) {
-    width: 150px; /* Increased width */
-}
-
-.table th:nth-child(6), /* Офис */
-.table td:nth-child(6) {
-    width: 150px; /* Increased width */
-}
-
-.table th:nth-child(7), /* Aproov */
-.table td:nth-child(7) {
-    width: 150px; /* Increased width */
-}
-
-.table th:nth-child(8), /* Зарплата 12 */
-.table td:nth-child(8) {
-    width: 220px; /* Increased width */
-}
-
-.table th:nth-child(9), /* Зарплата 3 */
-.table td:nth-child(9) {
-    width: 220px; /* Increased width */
-}
-
-.table th:nth-child(10), /* Налог 12 */
-.table td:nth-child(10) {
-    width: 200px; /* Increased width */
-}
-
-.table th:nth-child(11), /* Налог 3 */
-.table td:nth-child(11) {
-    width: 200px; /* Increased width */
-}
-
-.table th:nth-child(12), /* Потрачено 12 */
-.table td:nth-child(12) {
-    width: 220px; /* Increased width */
-}
-
-.table th:nth-child(13), /* Потрачено 3 */
-.table td:nth-child(13) {
-    width: 220px; /* Increased width */
-}
-
-.table th:nth-child(14), /* Деньги 12 */
-.table td:nth-child(14) {
-    width: 200px; /* Increased width */
-}
-
-.table th:nth-child(15), /* Деньги 3 */
-.table td:nth-child(15) {
-    width: 200px; /* Increased width */
-}
-
-.table th:nth-child(16), /* Зарплата Директора */
-.table td:nth-child(16) {
-    width: 280px; /* Increased width */
-}
-
-.table th:nth-child(17), /* Зарплата Супервайзера */
-.table td:nth-child(17) {
-    width: 280px; /* Increased width */
-}
-
-.table th:nth-child(18), /* Зарплата Трафик-мена */
-.table td:nth-child(18) {
-    width: 280px; /* Increased width */
-}
-
-.table th:nth-child(19), /* Итого */
-.table td:nth-child(19) {
-    width: 180px;
-}
-
-.table th:nth-child(20), /* Действия */
-.table td:nth-child(20) {
-    width: 220px;
 }
 
 /* Actions column */

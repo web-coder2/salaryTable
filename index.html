@@ -58,56 +58,56 @@
         <div class="table-responsive">
             <table class="table table-bordered entry-table">
                 <thead>
-                <tr>
-                    <th>Дата</th>
-                    <th>Сумма 12</th>
-                    <th>Сумма 3</th>
-                    <th>Робот</th>
-                    <th>Оклад</th>
-                    <th>Офис</th>
-                    <th>Aproov</th>
-                    <th>Зарплата 12</th>
-                    <th>Зарплата 3</th>
-                    <th>Налог 12</th>
-                    <th>Налог 3</th>
-                    <th>Потрачено 12</th>
-                    <th>Потрачено 3</th>
-                    <th>Деньги 12</th>
-                    <th>Деньги 3</th>
-                    <th>Зарплата Директора</th>
-                    <th>Зарплата Супервайзера</th>
-                    <th>Зарплата Трафик-мена</th>
-                    <th>Итого</th>
-                    <th class="actions-column">Действия</th>
-                </tr>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Сумма 12</th>
+                        <th>Сумма 3</th>
+                        <th>Робот</th>
+                        <th>Оклад</th>
+                        <th>Офис</th>
+                        <th>Aproov</th>
+                        <th>Зарплата 12</th>
+                        <th>Зарплата 3</th>
+                        <th>Налог 12</th>
+                        <th>Налог 3</th>
+                        <th>Потрачено 12</th>
+                        <th>Потрачено 3</th>
+                        <th>Деньги 12</th>
+                        <th>Деньги 3</th>
+                        <th>Зарплата Директора</th>
+                        <th>Зарплата Супервайзера</th>
+                        <th>Зарплата Трафик-мена</th>
+                        <th>Итого</th>
+                        <th class="actions-column" style="width: 120px;">Действия</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr v-for=" (item, index) in data" :key="item.id">
-                    <td>{{ item.date }}</td>
-                    <td>{{ item.sumHold12 }}</td>
-                    <td>{{ item.sumHold3 }}</td>
-                    <td>{{ item.robot }}</td>
-                    <td>{{ item.oklad }}</td>
-                    <td>{{ item.office }}</td>
-                    <td>{{ item.aproov }}</td>
-                    <td>{{ item.salary12 }}</td>
-                    <td>{{ item.salary3 }}</td>
-                    <td>{{ item.nalog12 }}</td>
-                    <td>{{ item.nalog3 }}</td>
-                    <td>{{ item.spent12 }}</td>
-                    <td>{{ item.spent3 }}</td>
-                    <td>{{ item.plus12 }}</td>
-                    <td>{{ item.plus3 }}</td>
-                    <td>{{ item.salaryDirector }}</td>
-                    <td>{{ item.salarySupervizer }}</td>
-                    <td>{{ item.salaryTraficman }}</td>
-                    <td>{{ item.total }}</td>
-                    <td>
-                        <div class="actions-group">
-                            <button @click="deleteData(item.id, index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
-                        </div>
-                    </td>
-                </tr>
+                    <tr v-for=" (item, index) in data" :key="item.id" :style="{'background-color': item.total > 0 ? '#28a228' : '#e86969'}">
+                        <td class="td-entry">{{ item.date }}</td>  <!-- Выравниваем текст справа -->
+                        <td class="td-entry">{{ item.sumHold12 }}</td>
+                        <td class="td-entry">{{ item.sumHold3 }}</td>
+                        <td class="td-entry">{{ item.robot }}</td>
+                        <td class="td-entry">{{ item.oklad }}</td>
+                        <td class="td-entry">{{ item.office }}</td>
+                        <td class="td-entry">{{ item.aproov }}</td>
+                        <td class="td-entry">{{ item.salary12 }}</td>
+                        <td class="td-entry">{{ item.salary3 }}</td>
+                        <td class="td-entry">{{ item.nalog12 }}</td>
+                        <td class="td-entry">{{ item.nalog3 }}</td>
+                        <td class="td-entry">{{ item.spent12 }}</td>
+                        <td class="td-entry">{{ item.spent3 }}</td>
+                        <td class="td-entry">{{ item.plus12 }}</td>
+                        <td class="td-entry">{{ item.plus3 }}</td>
+                        <td class="td-entry">{{ item.salaryDirector }}</td>
+                        <td class="td-entry">{{ item.salarySupervizer }}</td>
+                        <td class="td-entry">{{ item.salaryTraficman }}</td>
+                        <td class="td-entry">{{ item.total }}</td>
+                        <td>
+                            <div class="actions-group">
+                                <button @click="deleteData(item.id, index)" class="btn btn-danger btn-sm delete-button">Удалить</button>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
