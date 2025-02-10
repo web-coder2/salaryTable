@@ -153,6 +153,7 @@ input[type="password"] {
 .td-entry {
     font-weight: bold;
     text-align: right !important;
+    color: black;
 }
 
 /* Add colored borders between columns */
