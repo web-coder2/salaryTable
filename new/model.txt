@@ -1,0 +1,45 @@
+data = {
+    // формы ввода в html
+    aproov: 0.6 = const
+    date: Date input,
+    robot: integer input,
+    summHold: integer input,
+    differ: integer input,
+    oklad: integer input,
+    office: integer input,
+
+    // другая форма ввода html (отдельная)
+    defaultSuper: 1400
+    defaultDirector: 1500
+    defaultTraffic: 1000
+
+    // вычислить в бэкенде
+    nalog: (summHold+differ)*10*aproov*0,07
+    salary: (0,37*(summHold)) / 0,63 + summHold * aproov
+    spent:  robot + oklad + office + nalog + salary
+    officeSalary: (differ + summHold) * aproov * 10
+    salarySuper: если officeSalary > 0 тогда  ВПР(officeSalary, ladder, супервайзер) если officeSalary < 0 тогда defaultSuper
+    salaryDirector если officeSalary > 0 тогда ВПР(officeSalary, ladder, Директор) если officeSalary < 0 тогда defaultDirector
+    salaryTraffic если officeSalary > 0 тогда ВПР(officeSalary, ladder, Трафик-менеджер) если officeSalary < 0 тогда defaultTraffic
+}
+
+
+ladder = {
+    ЛЕСТНИЦА	Директор	Супервайзер	Трафик-менеджер
+    0	        3000	    2100	    1400
+    20000	    3600	    2600	    1700
+    40000	    4250	    3150	    2050
+    60000	    4950	    3750	    2450
+    80000	    5700	    4400	    2900
+    100000	    6500	    5100	    3400
+    120000	    7350	    5850	    3950
+    140000	    8250	    6650	    4550
+    160000	    9250	    7500	    5200
+    180000	    10300	    8400	    5900
+    200000	    11400	    9350	    6650
+    220000	    12550	    10350	    7450
+    240000	    13750	    11400	    8300
+    260000	    15000	    12500	    9200
+    280000	    16300	    13650	    10200
+    300000	    17650	    14850	    11250
+}
