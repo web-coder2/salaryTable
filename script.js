@@ -21,6 +21,7 @@ new Vue({
     mounted() {
         this.fetchData();
         this.fetchTable();
+        this.readJSONfile()
     },
     methods: {
         async fetchData() {
@@ -96,6 +97,17 @@ new Vue({
         },
         toggleTable() {
             this.showTable = !this.showTable;  // Изменяем видимость таблицы
+        },
+        async readJSONfile() {
+            let response = await fetch("/defaultData/dataJan.json")
+            let data = await response.json()
+            let filer = data['Январь 2025']
+            
+            for (let week in filer) {
+                for (let day in filer[week]) {
+                    console.log(day)
+                }
+            }
         }
     }
 });
