@@ -1,0 +1,242 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  max-width: 1200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+h1, h2 {
+  color: #8b0000;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block; /* Make labels block-level elements */
+  text-align: left;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+input[type="number"],
+input[type="date"] {
+  width: 100%; /* Make inputs fill the width of their parent */
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+/* Button Styles */
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.add-button {
+  background-color: #dc143c;
+}
+
+.add-button:hover {
+  background-color: #b22222;
+}
+
+.update-button {
+  background-color: #696969;
+}
+
+.update-button:hover {
+  background-color: #555;
+}
+
+.save-button {
+  background-color: #2f4f4f;
+}
+
+.save-button:hover {
+  background-color: #008080;
+}
+
+.delete-button {
+  background-color: #ff4500;
+}
+
+.delete-button:hover {
+  background-color: #f44336;
+}
+
+/* Table Styles */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: right;
+  vertical-align: middle;
+  font-weight: bold;
+}
+
+th {
+  background-color: #d3d3d3;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Scrollable Table Container */
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+}
+
+/* Grouped Tables */
+.grouped-tables-container {
+  display: flex;
+  flex-direction: column; /* Stack tables vertically */
+  align-items: stretch; /* Make tables take full width */
+  margin-top: 20px;
+}
+
+.table-wrapper {
+  width: 100%; /* Make tables full width */
+  margin-bottom: 20px;
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+/* Login Styles */
+.login-container {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  margin: 50px auto; /* Center the login container */
+}
+
+.login-container h1 {
+  text-align: center;
+  color: #8b0000;
+}
+
+.login-container label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #dc143c;
+  color: white;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #b22222;
+}
+
+.login-container .error {
+  color: red;
+  text-align: center;
+}
+
+/* Add animation for the button */
+.add-button.adding-animation {
+  animation: pulse 0.3s;
+}
+
+@keyframes pulse {
+  0% {
+      transform: scale(1);
+  }
+  50% {
+      transform: scale(1.1);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
+
+/* Media query для мобильных устройств */
+@media (max-width: 768px) {
+  .container {
+      width: 95%; /* Занимает почти всю ширину экрана */
+      padding: 10px;
+  }
+
+  h1 {
+      font-size: 2em; /* Уменьшаем размер заголовка */
+  }
+
+  h2 {
+      font-size: 1.5em;
+  }
+
+  table {
+      font-size: 0.8em; /* Уменьшаем размер шрифта в таблицах */
+  }
+
+  th, td {
+      padding: 5px; /* Уменьшаем отступы в ячейках таблицы */
+  }
+
+  /* Сделаем таблицы горизонтально прокручиваемыми */
+  .table-container {
+      overflow-x: auto;
+  }
+
+  .grouped-tables-container {
+      flex-direction: column; /* Располагаем таблицы вертикально */
+  }
+
+  .table-wrapper {
+      width: 100%; /* Таблицы занимают всю ширину */
+  }
+
+  /* Стили для формы логина */
+  .login-container {
+      width: 90%; /* Занимает почти всю ширину экрана */
+      margin: 20px auto; /* Отступы сверху и снизу, центрирование */
+  }
+}

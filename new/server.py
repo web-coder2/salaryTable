@@ -1,14 +1,20 @@
 
-# server.py (Flask)
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 from flask_cors import CORS
 import sqlite3
 import datetime
+from functools import wraps
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Change this to a random, secure key!
 CORS(app)
 
-DATABASE = 'data.db'  # Use the specified database name
+DATABASE = 'data.db'
+
+# Replace with your desired username and password
+USERNAME = 'admin'
+PASSWORD = 'qwertyuiop123A'
+
 
 def create_table():
     conn = sqlite3.connect(DATABASE)
@@ -31,15 +37,16 @@ def create_table():
             officeSalary REAL,
             salarySuper REAL,
             salaryDirector REAL,
-            salaryTraffic REAL
+            salaryTraffic REAL,
+            total REAL
         )
     ''')
     conn.commit()
     conn.close()
 
+
 create_table()
 
-# Ladder data (moved here for consistency, but should ideally be stored in DB or config file)
 LADDER = {
     0: {'Директор': 3000, 'Супервайзер': 2100, 'Трафик-менеджер': 1400},
     20000: {'Директор': 3600, 'Супервайзер': 2600, 'Трафик-менеджер': 1700},
@@ -61,64 +68,90 @@ LADDER = {
 
 
 def lookup_ladder(office_salary, role):
-    """Looks up salary in the LADDER based on office_salary."""
     keys = sorted(LADDER.keys())
     for i in range(len(keys) - 1):
         if keys[i] <= office_salary < keys[i + 1]:
             return LADDER[keys[i]][role]
     if office_salary >= keys[-1]:
         return LADDER[keys[-1]][role]
-    return LADDER[keys[0]][role]  #Default if less than the minimum ladder value
+    return LADDER[keys[0]][role]
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != USERNAME or request.form['password'] != PASSWORD:
+            error = 'Неверный логин или пароль'
+        else:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+    return render_template('login.html', error=error)
+
+
+@app.route('/logout')
+def logout():
+    session['logged_in'] = False
+    return redirect(url_for('login'))
+
+
+@app.route('/')
+@login_required
+def index():
+    return render_template('index.html')
+
 
 @app.route('/calculate', methods=['POST'])
+@login_required
 def calculate():
     data = request.get_json()
 
-    # Input Data
-    aproov = 0.6  # const
+    aproov = 0.6
     date = data['date']
     robot = int(data['robot'])
     summHold = int(data['summHold'])
-    differ = int(data['differ']) # Use the differ from the input
+    differ = int(data['differ'])
     oklad = int(data['oklad'])
     office = int(data['office'])
     defaultSuper = int(data['defaultSuper'])
     defaultDirector = int(data['defaultDirector'])
     defaultTraffic = int(data['defaultTraffic'])
 
-    # Calculations
     nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
     salary = round((0.37 * summHold) / 0.63 + summHold * aproov, 2)
     spent = round(robot + oklad + office + nalog + salary, 2)
     officeSalary = round((differ + summHold) * aproov * 10, 2)
 
-    # Corrected Salary Calculation
     salarySuper = round(lookup_ladder(officeSalary, 'Супервайзер') if officeSalary > 0 else defaultSuper, 2)
     salaryDirector = round(lookup_ladder(officeSalary, 'Директор') if officeSalary > 0 else defaultDirector, 2)
     salaryTraffic = round(lookup_ladder(officeSalary, 'Трафик-менеджер') if officeSalary > 0 else defaultTraffic, 2)
 
-    # Store in DB
+    total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
+
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic))
+        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total))
     conn.commit()
     conn.close()
 
-    return jsonify({
-        'nalog': nalog,
-        'salary': salary,
-        'spent': spent,
-        'officeSalary': officeSalary,
-        'salarySuper': salarySuper,
-        'salaryDirector': salaryDirector,
-        'salaryTraffic': salaryTraffic
-    })
+    return jsonify({'message': 'Calculation added successfully'})
 
 
 @app.route('/get_calculations', methods=['GET'])
+@login_required
 def get_calculations():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -126,7 +159,6 @@ def get_calculations():
     rows = cursor.fetchall()
     conn.close()
 
-    # Convert rows to a list of dictionaries for easy JSON serialization
     calculations = []
     for row in rows:
         calculations.append({
@@ -146,11 +178,14 @@ def get_calculations():
             'officeSalary': row[13],
             'salarySuper': row[14],
             'salaryDirector': row[15],
-            'salaryTraffic': row[16]
+            'salaryTraffic': row[16],
+            'total': row[17]
         })
     return jsonify(calculations)
 
+
 @app.route('/delete_calculation/<int:id>', methods=['DELETE'])
+@login_required
 def delete_calculation(id):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -161,39 +196,32 @@ def delete_calculation(id):
 
 
 @app.route('/update_ladder', methods=['POST'])
+@login_required
 def update_ladder():
-    """
-    Updates the LADDER data with values from the request.
-
-    This is a placeholder. In a real application, ladder data
-    should likely be stored and managed in the database.
-    """
     global LADDER
     ladder_data = request.get_json()
 
-    # Basic validation (improve this in a real application)
     if not isinstance(ladder_data, dict):
         return jsonify({'error': 'Invalid ladder data format'}), 400
 
     try:
-        #Clear existing data and reload from request
         LADDER.clear()
         for k, v in ladder_data.items():
-            LADDER[int(k)] = v #keys will be strings when received from frontend
+            LADDER[int(k)] = v
 
-        print("Ladder updated successfully:", LADDER)  # Log for debugging
+        print("Ladder updated successfully:", LADDER)
         return jsonify({'message': 'Ladder updated successfully'}), 200
 
     except Exception as e:
-        print(f"Error updating ladder: {e}")  # Log the error
+        print(f"Error updating ladder: {e}")
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/get_ladder', methods=['GET'])
+@login_required
 def get_ladder():
-    """
-    Returns the current LADDER data.
-    """
     return jsonify(LADDER)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
