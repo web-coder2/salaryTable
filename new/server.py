@@ -136,7 +136,7 @@ def calculate():
     salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
     salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
 
-    total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
+    total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -231,7 +231,7 @@ def update_ladder():
             salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
             salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
 
-            total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
+            total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
 
             # Update the calculation in the database
             cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
