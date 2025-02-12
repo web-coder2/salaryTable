@@ -48,22 +48,22 @@ def create_table():
 create_table()
 
 LADDER = {
-    0: {'Директор': 3000, 'Супервайзер': 2100, 'Трафик-менеджер': 1400},
-    20000: {'Директор': 3600, 'Супервайзер': 2600, 'Трафик-менеджер': 1700},
-    40000: {'Директор': 4250, 'Супервайзер': 3150, 'Трафик-менеджер': 2050},
-    60000: {'Директор': 4950, 'Супервайзер': 3750, 'Трафик-менеджер': 2450},
-    80000: {'Директор': 5700, 'Супервайзер': 4400, 'Трафик-менеджер': 2900},
-    100000: {'Директор': 6500, 'Супервайзер': 5100, 'Трафик-менеджер': 3400},
-    120000: {'Директор': 7350, 'Супервайзер': 5850, 'Трафик-менеджер': 3950},
-    140000: {'Директор': 8250, 'Супервайзер': 6650, 'Трафик-менеджер': 4550},
-    160000: {'Директор': 9250, 'Супервайзер': 7500, 'Трафик-менеджер': 5200},
-    180000: {'Директор': 10300, 'Супервайзер': 8400, 'Трафик-менеджер': 5900},
-    200000: {'Директор': 11400, 'Супервайзер': 9350, 'Трафик-менеджер': 6650},
-    220000: {'Директор': 12550, 'Супервайзер': 10350, 'Трафик-менеджер': 7450},
-    240000: {'Директор': 13750, 'Супервайзер': 11400, 'Трафик-менеджер': 8300},
-    260000: {'Директор': 15000, 'Супервайзер': 12500, 'Трафик-менеджер': 9200},
-    280000: {'Директор': 16300, 'Супервайзер': 13650, 'Трафик-менеджер': 10200},
-    300000: {'Директор': 17650, 'Супервайзер': 14850, 'Трафик-менеджер': 11250}
+    0: {'ladderValue': 0, 'Директор': 3000, 'Супервайзер': 2100, 'Трафик-менеджер': 1400},
+    20000: {'ladderValue': 20000, 'Директор': 3600, 'Супервайзер': 2600, 'Трафик-менеджер': 1700},
+    40000: {'ladderValue': 40000, 'Директор': 4250, 'Супервайзер': 3150, 'Трафик-менеджер': 2050},
+    60000: {'ladderValue': 60000, 'Директор': 4950, 'Супервайзер': 3750, 'Трафик-менеджер': 2450},
+    80000: {'ladderValue': 80000, 'Директор': 5700, 'Супервайзер': 4400, 'Трафик-менеджер': 2900},
+    100000: {'ladderValue': 100000, 'Директор': 6500, 'Супервайзер': 5100, 'Трафик-менеджер': 3400},
+    120000: {'ladderValue': 120000, 'Директор': 7350, 'Супервайзер': 5850, 'Трафик-менеджер': 3950},
+    140000: {'ladderValue': 140000, 'Директор': 8250, 'Супервайзер': 6650, 'Трафик-менеджер': 4550},
+    160000: {'ladderValue': 160000, 'Директор': 9250, 'Супервайзер': 7500, 'Трафик-менеджер': 5200},
+    180000: {'ladderValue': 180000, 'Директор': 10300, 'Супервайзер': 8400, 'Трафик-менеджер': 5900},
+    200000: {'ladderValue': 200000, 'Директор': 11400, 'Супервайзер': 9350, 'Трафик-менеджер': 6650},
+    220000: {'ladderValue': 220000, 'Директор': 12550, 'Супервайзер': 10350, 'Трафик-менеджер': 7450},
+    240000: {'ladderValue': 240000, 'Директор': 13750, 'Супервайзер': 11400, 'Трафик-менеджер': 8300},
+    260000: {'ladderValue': 260000, 'Директор': 15000, 'Супервайзер': 12500, 'Трафик-менеджер': 9200},
+    280000: {'ladderValue': 280000, 'Директор': 16300, 'Супервайзер': 13650, 'Трафик-менеджер': 10200},
+    300000: {'ladderValue': 300000, 'Директор': 17650, 'Супервайзер': 14850, 'Трафик-менеджер': 11250}
 }
 
 
@@ -132,9 +132,9 @@ def calculate():
     spent = round(robot + oklad + office + nalog + salary, 2)
     officeSalary = round((differ + summHold) * aproov * 10, 2)
 
-    salarySuper = round(lookup_ladder(officeSalary, 'Супервайзер') if officeSalary > 0 else defaultSuper, 2)
-    salaryDirector = round(lookup_ladder(officeSalary, 'Директор') if officeSalary > 0 else defaultDirector, 2)
-    salaryTraffic = round(lookup_ladder(officeSalary, 'Трафик-менеджер') if officeSalary > 0 else defaultTraffic, 2)
+    salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер') if officeSalary - spent > 0 else defaultSuper, 2)
+    salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
+    salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
 
     total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
 
@@ -208,6 +208,36 @@ def update_ladder():
         LADDER.clear()
         for k, v in ladder_data.items():
             LADDER[int(k)] = v
+
+        # Recalculate totals for all existing calculations
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
+        rows = cursor.fetchall()
+
+        for row in rows:
+            calculation_id, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
+
+            # Calculate dependent values
+            aproov = 0.6
+            nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
+            salary = round((0.37 * summHold) / 0.63 + summHold * aproov, 2)
+            spent = round(robot + oklad + office + nalog + salary, 2)
+            officeSalary = round((differ + summHold) * aproov * 10, 2)
+
+            # Retrieve default values from the database
+            salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер') if officeSalary - spent > 0 else defaultSuper, 2)
+            salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
+            salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
+
+            total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
+
+            # Update the calculation in the database
+            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+
+        conn.commit()
+        conn.close()
 
         print("Ladder updated successfully:", LADDER)
         return jsonify({'message': 'Ladder updated successfully'}), 200

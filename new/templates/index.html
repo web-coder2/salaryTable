@@ -10,7 +10,7 @@
 <div id="app">
     <div class="container">
         <h1>Калькулятор Зарплаты</h1>
-
+        <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
         <h2>Форма Ввода Данных</h2>
         <form @submit.prevent="addRecord">
             <label for="date">Дата:</label>
@@ -60,11 +60,11 @@
             </tr>
             </thead>
             <tbody>
-              <tr v-for="(ladderRow, ladderValue) in ladder" :key="ladderValue">
-                <td>[[ ladderValue ]]</td>
-                <td><input type="number" v-model.number="ladderRow['Директор']"></td>
-                <td><input type="number" v-model.number="ladderRow['Супервайзер']"></td>
-                <td><input type="number" v-model.number="ladderRow['Трафик-менеджер']"></td>
+            <tr v-for="(ladderRow, ladderValue) in ladder" :key="ladderValue">
+                <td><input type="number" v-model.number="ladder[ladderValue].ladderValue" @change="saveLadder"></td>
+                <td><input type="number" v-model.number="ladderRow['Директор']" @change="saveLadder"></td>
+                <td><input type="number" v-model.number="ladderRow['Супервайзер']" @change="saveLadder"></td>
+                <td><input type="number" v-model.number="ladderRow['Трафик-менеджер']" @change="saveLadder"></td>
             </tr>
             </tbody>
         </table>
@@ -95,29 +95,20 @@
                 <tbody>
                 <tr v-for="calculation in calculations" :key="calculation.id"
                     :style="{ backgroundColor: getTotalColor(calculation.total) }">
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.date ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.robot ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[
-                        calculation.summHold ]]
-                    </td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.differ ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.oklad ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.office ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.nalog ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.salary ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.spent ]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[
-                        calculation.officeSalary ]]
-                    </td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[
-                        calculation.salarySuper ]]
-                    </td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[
-                        calculation.salaryDirector ]]
-                    </td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.salaryTraffic ]] 
-                    </td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[ calculation.total ]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.date]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.robot]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.summHold]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.differ]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.oklad]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.office]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.nalog]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salary]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.spent]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.officeSalary]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salarySuper]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryDirector]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryTraffic]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.total]]</td>
                     <td>
                         <button @click="deleteCalculation(calculation.id)" class="delete-button">Удалить</button>
                     </td>
@@ -129,19 +120,25 @@
         <div class="grouped-tables-container">
             <div class="table-wrapper">
                 <button @click="toggleMonthlyTable">
-                    [[ showMonthlyTable ? 'Скрыть Месячные Записи' : 'Показать Месячные Записи' ]]
+                    {{ 'Скрыть Месячные Записи' if showMonthlyTable else 'Показать Месячные Записи' }}
                 </button>
                 <table v-if="showMonthlyTable">
                     <thead>
                     <tr>
-                        <th>Месяц</th>
+                        <th>Месяц/Год</th>
+                        <th>Зарплата Трафика</th>
+                        <th>Зарплата Супервайзера</th>
+                        <th>Зарплата Директора</th>
                         <th>Итого</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="monthlyData in monthlyCalculations" :key="monthlyData.month">
-                        <td>[[ monthlyData.month ]]</td>
-                        <td>[[ monthlyData.total ]]</td>
+                    <tr v-for="monthlyData in monthlyCalculations" :key="monthlyData.monthYear">
+                        <td>[[monthlyData.monthYear]]</td>
+                        <td>[[monthlyData.salaryTraffic]]</td>
+                        <td>[[monthlyData.salarySuper]]</td>
+                        <td>[[monthlyData.salaryDirector]]</td>
+                        <td>[[monthlyData.total]]</td>
                     </tr>
                     </tbody>
                 </table>
@@ -149,23 +146,37 @@
 
             <div class="table-wrapper">
                 <button @click="toggleYearlyTable">
-                    [[ showYearlyTable ? 'Скрыть Годовые Записи' : 'Показать Годовые Записи' ]]
+                    {{ 'Скрыть Годовые Записи' if showYearlyTable else 'Показать Годовые Записи' }}
                 </button>
                 <table v-if="showYearlyTable">
                     <thead>
                     <tr>
                         <th>Год</th>
+                        <th>Зарплата Трафика</th>
+                        <th>Зарплата Супервайзера</th>
+                        <th>Зарплата Директора</th>
                         <th>Итого</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr v-for="yearlyData in yearlyCalculations" :key="yearlyData.year">
-                        <td>[[ yearlyData.year ]]</td>
-                        <td>[[ yearlyData.total ]]</td>
+                        <td>[[yearlyData.year]]</td>
+                        <td>[[yearlyData.salaryTraffic]]</td>
+                        <td>[[yearlyData.salarySuper]]</td>
+                        <td>[[yearlyData.salaryDirector]]</td>
+                        <td>[[yearlyData.total]]</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
+
+            <div class="file-upload">
+                <label for="file-input" class="file-label">
+                    <span>Загрузить JSON файл</span>
+                    <input id="file-input" type="file" @change="handleFileChange" accept=".json" />
+                </label>
+            </div>
+
         </div>
     </div>
 </div>

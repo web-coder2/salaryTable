@@ -18,7 +18,8 @@ body {
   width: 90%;
   max-width: 1200px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+  box-sizing: border-box;
+  margin: 50px auto; /* Добавляем отступы сверху и снизу */
 }
 
 h1, h2 {
@@ -72,6 +73,7 @@ button {
 
 .save-button {
   background-color: #2f4f4f;
+  margin-top: 20px; /* Добавляем отступ сверху */
 }
 
 .save-button:hover {
@@ -129,114 +131,208 @@ th {
   box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
 }
 
+.table-wrapper button {
+    background-color: #3498db; /* Choose your desired color */
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.table-wrapper button:hover {
+    background-color: #2980b9; /* Slightly darker shade for hover effect */
+}
+
 /* Login Styles */
 .login-container {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 20px;
-  width: 300px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  margin: 50px auto; /* Center the login container */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 50px auto; /* Center the login container */
 }
 
 .login-container h1 {
-  text-align: center;
-  color: #8b0000;
+    text-align: center;
+    color: #8b0000;
 }
 
 .login-container label {
-  display: block;
-  text-align: left;
-  margin-bottom: 5px;
-  color: #555;
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    color: #555;
 }
 
 .login-container input[type="text"],
 .login-container input[type="password"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 .login-container button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  background-color: #dc143c;
-  color: white;
-  cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #dc143c;
+    color: white;
+    cursor: pointer;
 }
 
 .login-container button:hover {
-  background-color: #b22222;
+    background-color: #b22222;
 }
 
 .login-container .error {
-  color: red;
-  text-align: center;
+    color: red;
+    text-align: center;
 }
 
 /* Add animation for the button */
 .add-button.adding-animation {
-  animation: pulse 0.3s;
+    animation: pulse 0.3s;
 }
 
 @keyframes pulse {
-  0% {
-      transform: scale(1);
-  }
-  50% {
-      transform: scale(1.1);
-  }
-  100% {
-      transform: scale(1);
-  }
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
-/* Media query для мобильных устройств */
+/* Медиа-запрос для адаптации к viewport */
 @media (max-width: 768px) {
+  /* Общие адаптации */
+  body {
+    font-size: 0.9em; /* Уменьшаем размер шрифта по умолчанию */
+  }
+
   .container {
-      width: 95%; /* Занимает почти всю ширину экрана */
-      padding: 10px;
+    width: 95%; /* Занимает почти всю ширину экрана */
+    padding: 10px;
   }
 
   h1 {
-      font-size: 2em; /* Уменьшаем размер заголовка */
+    font-size: 1.8em; /* Уменьшаем размер заголовка */
+    margin-bottom: 10px;
   }
 
   h2 {
-      font-size: 1.5em;
+    font-size: 1.4em;
+    margin-bottom: 8px;
   }
 
+  /* Адаптация для таблиц */
   table {
-      font-size: 0.8em; /* Уменьшаем размер шрифта в таблицах */
+    font-size: 0.75em; /* Уменьшаем размер шрифта в таблицах */
   }
 
-  th, td {
-      padding: 5px; /* Уменьшаем отступы в ячейках таблицы */
+  th,
+  td {
+    padding: 4px;
+    white-space: nowrap; /* Предотвращаем перенос текста */
   }
 
   /* Сделаем таблицы горизонтально прокручиваемыми */
   .table-container {
-      overflow-x: auto;
+    overflow-x: auto;
   }
 
-  .grouped-tables-container {
-      flex-direction: column; /* Располагаем таблицы вертикально */
+  /* Адаптация для форм */
+  input[type="number"],
+  input[type="date"],
+  input[type="text"],
+  input[type="password"] {
+    width: 100%; /* Поля занимают всю ширину */
+    max-width: 100%; /* Ограничиваем максимальную ширину */
+    box-sizing: border-box; /* Включает padding и border в ширину */
   }
 
-  .table-wrapper {
-      width: 100%; /* Таблицы занимают всю ширину */
+  /* Адаптация для кнопок */
+  button {
+    padding: 8px 12px;
+    font-size: 0.9em;
   }
 
-  /* Стили для формы логина */
-  .login-container {
-      width: 90%; /* Занимает почти всю ширину экрана */
-      margin: 20px auto; /* Отступы сверху и снизу, центрирование */
+  /* Адаптация для загрузки файлов */
+  .file-upload {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .file-label {
+    width: 100%;
+    max-width: 300px; /* Ограничиваем максимальную ширину */
+    height: auto;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+
+  .file-label span {
+    font-size: 0.9em;
+  }
+
+  /* Дополнительные адаптации по мере необходимости */
+}
+
+.file-upload {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.file-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 300px;
+  height: 150px;
+  background: linear-gradient(145deg, #81d4fa, #33b5e5);
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.file-label:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.file-label span {
+  font-size: 1.1em;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0);
   }
 }
