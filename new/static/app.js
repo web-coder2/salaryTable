@@ -68,6 +68,7 @@ createApp({
                 monthlyData[monthYear].salarySuper += calc.salarySuper;
                 monthlyData[monthYear].salaryDirector += calc.salaryDirector;
                 monthlyData[monthYear].total += calc.total;
+
             });
             return Object.values(monthlyData);
         },
@@ -90,6 +91,32 @@ createApp({
                 yearlyData[year].total += calc.total;
             });
             return Object.values(yearlyData);
+        },
+        middleMounth(){
+
+            let traficSumm = 0;
+            let superSumm = 0;
+            let directorSumm = 0;
+            let total = 0
+
+            for (let item in this.monthlyCalculations) {
+                traficSumm += this.monthlyCalculations[item].salaryTraffic;
+                superSumm += this.monthlyCalculations[item].salarySuper;
+                directorSumm += this.monthlyCalculations[item].salaryDirector;
+                total += this.monthlyCalculations[item].total;
+            }
+
+            traficSumm = traficSumm / this.monthlyCalculations.length
+            superSumm = superSumm / this.monthlyCalculations.length
+            directorSumm = directorSumm / this.monthlyCalculations.length
+            total = total / this.monthlyCalculations.length
+
+            return {
+                trafic: Math.floor(traficSumm),
+                super: Math.floor(superSumm),
+                director: Math.floor(directorSumm),
+                total: Math.floor(total)
+            }
         }
     },
     methods: {

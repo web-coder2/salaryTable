@@ -336,3 +336,8 @@ input[type="file"] {
     transform: translateY(0);
   }
 }
+
+.middle-table-td {
+  background-color: #185514;
+  color: white;
+}
