@@ -146,7 +146,13 @@ def calculate():
     salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
     salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
 
-    total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
+    if summHold == 0:
+        total = 0
+        salarySuper = 0
+        salaryDirector = 0
+        salaryTraffic = 0
+    else:
+        total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()

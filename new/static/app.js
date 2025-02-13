@@ -239,11 +239,11 @@ createApp({
         },
         getTotalColor(total) {
             if (total > 0) {
-                return 'rgba(0, 255, 0, 0.1)'; // Green for positive total
+                return 'rgba(42, 96, 42, 0.5)'; // Green for positive total
             } else if (total < 0) {
-                return 'rgba(255, 0, 0, 0.1)'; // Red for negative total
+                return 'rgba(240, 63, 63, 0.5)'; // Red for negative total
             } else {
-                return 'rgba(255, 255, 0, 0.1)'; // Yellow for zero
+                return 'rgba(250, 250, 11, 0.5)'; // Yellow for zero
             }
         },
     }
