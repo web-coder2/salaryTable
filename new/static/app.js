@@ -37,7 +37,7 @@ createApp({
             },
             results: null,
             calculations: [],
-            showMonthlyTable: true,
+            showMonthlyTable: false,
             showYearlyTable: false,
             isAdding: false,
         };
@@ -110,6 +110,31 @@ createApp({
             superSumm = superSumm / this.monthlyCalculations.length
             directorSumm = directorSumm / this.monthlyCalculations.length
             total = total / this.monthlyCalculations.length
+
+            return {
+                trafic: Math.floor(traficSumm),
+                super: Math.floor(superSumm),
+                director: Math.floor(directorSumm),
+                total: Math.floor(total)
+            }
+        },
+        middleYear(){
+            let traficSumm = 0;
+            let superSumm = 0;
+            let directorSumm = 0;
+            let total = 0
+
+            for (let item in this.yearlyCalculations) {
+                traficSumm += this.yearlyCalculations[item].salaryTraffic;
+                superSumm += this.yearlyCalculations[item].salarySuper;
+                directorSumm += this.yearlyCalculations[item].salaryDirector;
+                total += this.yearlyCalculations[item].total;
+            }
+
+            traficSumm = traficSumm / this.yearlyCalculations.length
+            superSumm = superSumm / this.yearlyCalculations.length
+            directorSumm = directorSumm / this.yearlyCalculations.length
+            total = total / this.yearlyCalculations.length
 
             return {
                 trafic: Math.floor(traficSumm),

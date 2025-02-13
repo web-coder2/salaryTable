@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Програма для Володи и точка</title>
+    <title>Резиденция 3.0</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div id="app">
     <div class="container">
-        <h1>Програма для Володи и точка</h1>
+        <h1>Резиденция 3.0</h1>
         <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
         <h2>Форма Ввода Данных</h2>
         <form @submit.prevent="addRecord">
@@ -75,9 +75,9 @@
             <table>
                 <thead>
                 <tr>
-                    <th style="white-space: nowrap;">Дата</th>
+                    <th style="white-space: nowrap;">Дата записи</th>
                     <th style="white-space: nowrap;">Робот</th>
-                    <th style="white-space: nowrap;">Сумма на Руках</th>
+                    <th style="white-space: nowrap;">Сумма Hold</th>
                     <th style="white-space: nowrap;">Разница</th>
                     <th style="white-space: nowrap;">Оклад</th>
                     <th style="white-space: nowrap;">Офис</th>
@@ -89,7 +89,7 @@
                     <th style="white-space: nowrap;">Зарплата Директора</th>
                     <th style="white-space: nowrap;">Зарплата Трафик-менеджера</th>
                     <th style="white-space: nowrap;">Total</th>
-                    <th style="white-space: nowrap;">Действия</th>
+                    <th style="white-space: nowrap;">Удалить</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -120,7 +120,7 @@
         <div class="grouped-tables-container">
             <div class="table-wrapper">
                 <button @click="toggleMonthlyTable">
-                    {{ 'Скрыть Месячные Записи' if showMonthlyTable else 'Показать Месячные Записи' }}
+                    [[ showMonthlyTable ? 'скрыть за месяц' : 'показать за месяц' ]]
                 </button>
                 <table v-if="showMonthlyTable">
                     <thead>
@@ -153,7 +153,7 @@
 
             <div class="table-wrapper">
                 <button @click="toggleYearlyTable">
-                    {{ 'Скрыть Годовые Записи' if showYearlyTable else 'Показать Годовые Записи' }}
+                    [[ showYearlyTable ? 'скрыть за год' : 'показать за год' ]]
                 </button>
                 <table v-if="showYearlyTable">
                     <thead>
@@ -172,6 +172,13 @@
                         <td>[[yearlyData.salarySuper]]</td>
                         <td>[[yearlyData.salaryDirector]]</td>
                         <td>[[yearlyData.total]]</td>
+                    </tr>
+                    <tr class="middle-table-td2">
+                        <td>среднее по месяцам</td>
+                        <td>[[middleYear.trafic]]</td>
+                        <td>[[middleYear.super]]</td>
+                        <td>[[middleYear.director]]</td>
+                        <td>[[middleYear.total]]</td>
                     </tr>
                     </tbody>
                 </table>
