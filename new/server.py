@@ -67,14 +67,24 @@ LADDER = {
 }
 
 
-def lookup_ladder(office_salary, role):
+def lookup_ladder(office_salary, role, date):
     keys = sorted(LADDER.keys())
-    for i in range(len(keys) - 1):
-        if keys[i] <= office_salary < keys[i + 1]:
-            return LADDER[keys[i]][role]
-    if office_salary >= keys[-1]:
-        return LADDER[keys[-1]][role]
-    return LADDER[keys[0]][role]
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    if date.weekday() < 5:
+        for i in range(len(keys) - 1):
+            if keys[i] <= office_salary < keys[i + 1]:
+                return LADDER[keys[i]][role]
+        if office_salary >= keys[-1]:
+            return LADDER[keys[-1]][role]
+        return LADDER[keys[0]][role]
+    if date.weekday() >= 5 and office_salary >= 20000:  # если работали в суботу или вскренье И зп офсиа была от 20к
+        # при работе в выходные дни будет сетка + 1
+        for i in range(len(keys) - 1):
+            if keys[i] <= office_salary < keys[i + 1]:
+                return LADDER[keys[i + 1]][role]
+        if office_salary >= keys[-1]:
+            return LADDER[keys[-1]][role]
+        return LADDER[keys[1]][role]
 
 
 def login_required(f):
@@ -132,9 +142,9 @@ def calculate():
     spent = round(robot + oklad + office + nalog + salary, 2)
     officeSalary = round((differ + summHold) * aproov * 10, 2)
 
-    salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер') if officeSalary - spent > 0 else defaultSuper, 2)
-    salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
-    salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
+    salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
+    salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
+    salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
 
     total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
 
@@ -227,9 +237,9 @@ def update_ladder():
             officeSalary = round((differ + summHold) * aproov * 10, 2)
 
             # Retrieve default values from the database
-            salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер') if officeSalary - spent > 0 else defaultSuper, 2)
-            salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор') if officeSalary - spent > 0 else defaultDirector, 2)
-            salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер') if officeSalary - spent > 0 else defaultTraffic, 2)
+            salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
+            salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
+            salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
 
             total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
 
