@@ -128,7 +128,7 @@ def calculate():
     defaultTraffic = int(data['defaultTraffic'])
 
     nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
-    salary = round((0.37 * summHold) / 0.63 + summHold * aproov, 2)
+    salary = round((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
     spent = round(robot + oklad + office + nalog + salary, 2)
     officeSalary = round((differ + summHold) * aproov * 10, 2)
 
@@ -222,7 +222,7 @@ def update_ladder():
             # Calculate dependent values
             aproov = 0.6
             nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
-            salary = round((0.37 * summHold) / 0.63 + summHold * aproov, 2)
+            salary = round((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
             spent = round(robot + oklad + office + nalog + salary, 2)
             officeSalary = round((differ + summHold) * aproov * 10, 2)
 

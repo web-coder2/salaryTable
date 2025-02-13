@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор Зарплаты</title>
+    <title>Програма для Володи и точка</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div id="app">
     <div class="container">
-        <h1>Калькулятор Зарплаты</h1>
+        <h1>Програма для Володи и точка</h1>
         <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
         <h2>Форма Ввода Данных</h2>
         <form @submit.prevent="addRecord">
