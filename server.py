@@ -69,7 +69,8 @@ LADDER = {
 
 def lookup_ladder(office_salary, role, date):
     keys = sorted(LADDER.keys())
-    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
+    #date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
     if date.weekday() < 5:
         for i in range(len(keys) - 1):
             if keys[i] <= office_salary < keys[i + 1]:
