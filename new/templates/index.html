@@ -31,7 +31,7 @@
             <label for="office">Офис:</label>
             <input type="number" id="office" v-model.number="formData.office" required><br><br>
 
-            <button type="submit" class="add-button" :class="{ 'adding-animation': isAdding }">Добавить Запись в БД
+            <button type="submit" class="btn btn-success" :class="{ 'adding-animation': isAdding }">Добавить Запись в БД
             </button>
         </form>
 
@@ -46,33 +46,35 @@
             <label for="defaultTraffic">Трафик-менеджер (по умолчанию):</label>
             <input type="number" id="defaultTraffic" v-model.number="defaultValues.defaultTraffic" required><br><br>
 
-            <button type="submit" class="update-button">Обновить Значения по Умолчанию</button>
+            <button type="submit" class="btn btn-success">Обновить Значения по Умолчанию</button>
         </form>
 
-        <h2>Таблица Лестницы</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>ЛЕСТНИЦА</th>
-                <th>Директор</th>
-                <th>Супервайзер</th>
-                <th>Трафик-менеджер</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="(ladderRow, ladderValue) in ladder" :key="ladderValue">
-                <td><input type="number" v-model.number="ladder[ladderValue].ladderValue" @change="saveLadder"></td>
-                <td><input type="number" v-model.number="ladderRow['Директор']" @change="saveLadder"></td>
-                <td><input type="number" v-model.number="ladderRow['Супервайзер']" @change="saveLadder"></td>
-                <td><input type="number" v-model.number="ladderRow['Трафик-менеджер']" @change="saveLadder"></td>
-            </tr>
-            </tbody>
-        </table>
-        <button @click="saveLadder" class="save-button">Сохранить Лестницу</button>
+        <div class="edit-table-section table-responsive">
+            <h2>Таблица Лестницы</h2>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ЛЕСТНИЦА</th>
+                    <th>Директор</th>
+                    <th>Супервайзер</th>
+                    <th>Трафик-мен</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(ladderRow, ladderValue) in ladder" :key="ladderValue">
+                    <td><input class="table-input form-control" type="number" v-model.number="ladder[ladderValue].ladderValue" @change="saveLadder"></td>
+                    <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Директор']" @change="saveLadder"></td>
+                    <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Супервайзер']" @change="saveLadder"></td>
+                    <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Трафик-менеджер']" @change="saveLadder"></td>
+                </tr>
+                </tbody>
+            </table>
+            <button @click="saveLadder" class="btn btn-success" style="margin-top: 20px;">Сохранить Лестницу</button>
+        </div>
 
         <h2>Все Записи</h2>
-        <div class="table-container">
-            <table>
+        <div class="table-responsive">
+            <table class="table table-bordered entry-table">
                 <thead>
                 <tr>
                     <th style="white-space: nowrap;">Дата записи</th>
@@ -84,10 +86,10 @@
                     <th style="white-space: nowrap;">Налог</th>
                     <th style="white-space: nowrap;">Зарплата</th>
                     <th style="white-space: nowrap;">Потрачено</th>
-                    <th style="white-space: nowrap;">Зарплата по Офису</th>
-                    <th style="white-space: nowrap;">Зарплата Супервайзера</th>
-                    <th style="white-space: nowrap;">Зарплата Директора</th>
-                    <th style="white-space: nowrap;">Зарплата Трафик-менеджера</th>
+                    <th style="white-space: nowrap;">ЗП по Офису</th>
+                    <th style="white-space: nowrap;">ЗП Супера</th>
+                    <th style="white-space: nowrap;">ЗП Директора</th>
+                    <th style="white-space: nowrap;">ЗП Трафик-мена</th>
                     <th style="white-space: nowrap;">Total</th>
                     <th style="white-space: nowrap;">Удалить</th>
                 </tr>
@@ -110,7 +112,7 @@
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryTraffic]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.total]]</td>
                     <td>
-                        <button @click="deleteCalculation(calculation.id)" class="delete-button">Удалить</button>
+                        <button @click="deleteCalculation(calculation.id)" class="btn btn-danger btn-sm delete-button">Удалить</button>
                     </td>
                 </tr>
                 </tbody>
@@ -118,70 +120,74 @@
         </div>
 
         <div class="grouped-tables-container">
-            <div class="table-wrapper">
-                <button @click="toggleMonthlyTable">
+            <div class="grouped-data-section">
+                <button @click="toggleMonthlyTable" class="btn btn-info" style="margin-top: 20px;">
                     [[ showMonthlyTable ? 'скрыть за месяц' : 'показать за месяц' ]]
                 </button>
-                <table v-if="showMonthlyTable">
-                    <thead>
-                    <tr>
-                        <th>Месяц/Год</th>
-                        <th>Зарплата Трафика</th>
-                        <th>Зарплата Супервайзера</th>
-                        <th>Зарплата Директора</th>
-                        <th>Итого</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="monthlyData in monthlyCalculations" :key="monthlyData.monthYear">
-                        <td>[[monthlyData.monthYear]]</td>
-                        <td>[[monthlyData.salaryTraffic]]</td>
-                        <td>[[monthlyData.salarySuper]]</td>
-                        <td>[[monthlyData.salaryDirector]]</td>
-                        <td>[[monthlyData.total]]</td>
-                    </tr>
-                    <tr class="middle-table-td">
-                        <td>среднее по месяцам</td>
-                        <td>[[middleMounth.trafic]]</td>
-                        <td>[[middleMounth.super]]</td>
-                        <td>[[middleMounth.director]]</td>
-                        <td>[[middleMounth.total]]</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table v-if="showMonthlyTable" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Месяц/Год</th>
+                            <th>ЗП Трафика</th>
+                            <th>ЗП Супервайзера</th>
+                            <th>ЗП Директора</th>
+                            <th>Итого</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="monthlyData in monthlyCalculations" :key="monthlyData.monthYear">
+                            <td>[[monthlyData.monthYear]]</td>
+                            <td>[[monthlyData.salaryTraffic]]</td>
+                            <td>[[monthlyData.salarySuper]]</td>
+                            <td>[[monthlyData.salaryDirector]]</td>
+                            <td>[[monthlyData.total]]</td>
+                        </tr>
+                        <tr class="middle-table-td">
+                            <td>среднее по месяцам</td>
+                            <td>[[middleMounth.trafic]]</td>
+                            <td>[[middleMounth.super]]</td>
+                            <td>[[middleMounth.director]]</td>
+                            <td>[[middleMounth.total]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="table-wrapper">
-                <button @click="toggleYearlyTable">
+            <div class="grouped-data-section">
+                <button @click="toggleYearlyTable" class="btn btn-info">
                     [[ showYearlyTable ? 'скрыть за год' : 'показать за год' ]]
                 </button>
-                <table v-if="showYearlyTable">
-                    <thead>
-                    <tr>
-                        <th>Год</th>
-                        <th>Зарплата Трафика</th>
-                        <th>Зарплата Супервайзера</th>
-                        <th>Зарплата Директора</th>
-                        <th>Итого</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr v-for="yearlyData in yearlyCalculations" :key="yearlyData.year">
-                        <td>[[yearlyData.year]]</td>
-                        <td>[[yearlyData.salaryTraffic]]</td>
-                        <td>[[yearlyData.salarySuper]]</td>
-                        <td>[[yearlyData.salaryDirector]]</td>
-                        <td>[[yearlyData.total]]</td>
-                    </tr>
-                    <tr class="middle-table-td2">
-                        <td>среднее по месяцам</td>
-                        <td>[[middleYear.trafic]]</td>
-                        <td>[[middleYear.super]]</td>
-                        <td>[[middleYear.director]]</td>
-                        <td>[[middleYear.total]]</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table v-if="showYearlyTable" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Год</th>
+                            <th>ЗП Трафика</th>
+                            <th>ЗП Супервайзера</th>
+                            <th>ЗП Директора</th>
+                            <th>Итого</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="yearlyData in yearlyCalculations" :key="yearlyData.year">
+                            <td>[[yearlyData.year]]</td>
+                            <td>[[yearlyData.salaryTraffic]]</td>
+                            <td>[[yearlyData.salarySuper]]</td>
+                            <td>[[yearlyData.salaryDirector]]</td>
+                            <td>[[yearlyData.total]]</td>
+                        </tr>
+                        <tr class="middle-table-td2">
+                            <td>среднее по месяцам</td>
+                            <td>[[middleYear.trafic]]</td>
+                            <td>[[middleYear.super]]</td>
+                            <td>[[middleYear.director]]</td>
+                            <td>[[middleYear.total]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="file-upload">
