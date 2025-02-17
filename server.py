@@ -150,14 +150,14 @@ def calculate():
     defaultDirector = int(data['defaultDirector'])
     defaultTraffic = int(data['defaultTraffic'])
 
-    nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 2)
-    salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
-    spent = rounder(robot + oklad + office + nalog + salary, 2)
-    officeSalary = rounder((differ + summHold) * aproov * 10, 2)
+    nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 0)
+    salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 0)
+    spent = rounder(robot + oklad + office + nalog + salary, 0)
+    officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
-    salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
-    salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
-    salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
+    salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
+    salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
+    salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
 
     if summHold == 0:
         total = 0
@@ -256,17 +256,17 @@ def update_ladder():
 
             # Calculate dependent values
             aproov = 0.6
-            nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 2)
-            salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
-            spent = rounder(robot + oklad + office + nalog + salary, 2)
-            officeSalary = rounder((differ + summHold) * aproov * 10, 2)
+            nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 0)
+            salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 0)
+            spent = rounder(robot + oklad + office + nalog + salary, 0)
+            officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
             # Retrieve default values from the database
-            salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
-            salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
-            salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
+            salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
+            salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
+            salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
 
-            total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
+            total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
             # Update the calculation in the database
             cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
