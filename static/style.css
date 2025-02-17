@@ -263,6 +263,14 @@ border-right: none; /* Remove the right border for the last column */
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
+@media (max-width: 480px) {
+  .file-label {
+    width: 90%;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
 .file-label:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);

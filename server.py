@@ -22,7 +22,7 @@ def create_table():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS salary_calculations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT,
+            date Date,
             robot INTEGER,
             summHold INTEGER,
             differ INTEGER,
@@ -69,8 +69,13 @@ LADDER = {
 
 def lookup_ladder(office_salary, role, date):
     keys = sorted(LADDER.keys())
-    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
-    #date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
+    try:
+        date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
+    except:
+        try:
+            date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
+        except:
+            date = datetime.datetime.strptime(date, '%m.%d.%Y').date() 
     if date.weekday() < 5:
         for i in range(len(keys) - 1):
             if keys[i] <= office_salary < keys[i + 1]:
@@ -127,6 +132,13 @@ def index():
 def calculate():
     data = request.get_json()
 
+    def rounder(num, decem):
+        if num is None:
+            return 0
+        else:
+            return round(num, decem)
+
+
     aproov = 0.6
     date = data['date']
     robot = int(data['robot'])
@@ -138,14 +150,14 @@ def calculate():
     defaultDirector = int(data['defaultDirector'])
     defaultTraffic = int(data['defaultTraffic'])
 
-    nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
-    salary = round((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
-    spent = round(robot + oklad + office + nalog + salary, 2)
-    officeSalary = round((differ + summHold) * aproov * 10, 2)
+    nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 2)
+    salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
+    spent = rounder(robot + oklad + office + nalog + salary, 2)
+    officeSalary = rounder((differ + summHold) * aproov * 10, 2)
 
-    salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
-    salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
-    salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
+    salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
+    salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
+    salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
 
     if summHold == 0:
         total = 0
@@ -230,25 +242,31 @@ def update_ladder():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
+        cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
         rows = cursor.fetchall()
 
+        def rounder(num, decem):
+            if num is None:
+                return 0
+            else:
+                return round(num, decem)
+
         for row in rows:
-            calculation_id, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
+            calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
 
             # Calculate dependent values
             aproov = 0.6
-            nalog = round((summHold + differ) * 10 * aproov * 0.07, 2)
-            salary = round((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
-            spent = round(robot + oklad + office + nalog + salary, 2)
-            officeSalary = round((differ + summHold) * aproov * 10, 2)
+            nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 2)
+            salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 2)
+            spent = rounder(robot + oklad + office + nalog + salary, 2)
+            officeSalary = rounder((differ + summHold) * aproov * 10, 2)
 
             # Retrieve default values from the database
-            salarySuper = round(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
-            salaryDirector = round(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
-            salaryTraffic = round(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
+            salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 2)
+            salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 2)
+            salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 2)
 
-            total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
+            total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 2)
 
             # Update the calculation in the database
             cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
