@@ -223,7 +223,6 @@ def delete_calculation(id):
     conn.close()
     return jsonify({'message': 'Calculation deleted successfully'})
 
-
 @app.route('/update_ladder', methods=['POST'])
 @login_required
 def update_ladder():
@@ -281,6 +280,70 @@ def update_ladder():
         print(f"Error updating ladder: {e}")
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/update_defaults', methods=["POST"])
+@login_required
+def update_defaults():
+    defaults_data = request.get_json()
+    if not isinstance(defaults_data, dict):
+        return jsonify({'error': 'Invalid defaults data format'}), 400
+    
+    defaultSuper2 = defaults_data["defaultSuper"]
+    defaultDirector2 = defaults_data["defaultDirector"]
+    defaultTraffic2 = defaults_data["defaultTraffic"]
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
+    rows = cursor.fetchall()
+
+    def rounder(num, decem):
+        if num is None:
+            return 0
+        else:
+            return round(num, decem)
+
+    for row in rows:
+
+        calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
+
+        # Calculate dependent values
+        aproov = 0.6
+        nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 0)
+        salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 0)
+        spent = rounder(robot + oklad + office + nalog + salary, 0)
+        officeSalary = rounder((differ + summHold) * aproov * 10, 0)
+
+        # Retrieve default values from the database
+        salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper2, 0)
+        salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector2, 0)
+        salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic2, 0)
+
+        total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+
+        # Update the calculation in the database
+        cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+    
+    conn.commit()
+    conn.close()
+
+    print("Defaults updated successfully:", defaults_data)
+    return jsonify({'message': 'Defaults updated successfully'}), 200
+
+
+@app.route('/get_defaults', methods=["GET"])
+@login_required
+def get_defaults():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM salary_calculations LIMIT 1")
+    row = cursor.fetchone()
+    conn.close()
+    return jsonify({
+        "super-default": row[14],
+        "director-default": row[15],
+        "traffic-default": row[16]
+    })
 
 @app.route('/get_ladder', methods=['GET'])
 @login_required

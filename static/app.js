@@ -44,6 +44,7 @@ createApp({
     },
     mounted() {
         this.fetchCalculations();
+        this.fetchDefault()
         this.fetchLadder();
     },
     delimiters: ['[[', ']]'], 
@@ -205,7 +206,18 @@ createApp({
             };
         },
         async updateDefaults() {
-            console.log("Updating defaults:", this.defaultValues);
+            try {
+                const response = await axios.post('http://localhost:5000/update_defaults', this.defaultValues);
+                if (response.status === 200) {
+                    alert('Значения по умолчанию сохранены успешно!');
+                    this.fetchCalculations();
+                } else {
+                    alert('Не удалось сохранить значения по умолчанию.');
+                }
+            } catch {
+                console.log('Error updating defaults:');
+                alert('Ошибка при сохранении значений по умолчанию.');
+            }
         },
         async saveLadder() {
             try {
@@ -240,6 +252,16 @@ createApp({
                 this.ladder = response.data;
             } catch (error) {
                 console.error('Error fetching ladder:', error);
+            }
+        },
+        async fetchDefault() {
+            try {
+                const response = await axios.get('http://localhost:5000/get_defaults')
+                this.defaultValues["defaultSuper"] = response.data["super-default"]
+                this.defaultValues["defaultDirector"] = response.data["director-default"]
+                this.defaultValues["defaultTraffic"] = response.data["traffic-default"]
+            } catch (error) {
+                console.log("hui tam a ne defaults >>> ", error)
             }
         },
         async deleteCalculation(id) {
