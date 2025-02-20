@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чистая 3.0</title>
+    <title>HBACash</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div id="app">
     <div class="container">
-        <h1>Чистая 3.0</h1>
+        <h1>HBACash</h1>
         <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
         <h2>Форма Ввода Данных</h2>
         <form @submit.prevent="addRecord">
