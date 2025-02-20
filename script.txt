@@ -1,3 +1,2 @@
-sudo docker pull ubuntu:18.10 (скачать образ убунты для докера из докерХаба)
-docker run ubuntu:18.10 echo "docker has been started )))" (запуск docker-убунты)
-docker build ./doc --tag runner (сама уже сборка докера)
+docker build -t salaryapp .
+docker run -d -p 5000:5000 -v data.db testapp
