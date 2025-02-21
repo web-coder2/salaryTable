@@ -37,14 +37,12 @@ def create_table():
             oklad INTEGER,
             office INTEGER,
             defaultSuper INTEGER,
-            defaultDirector INTEGER,
             defaultTraffic INTEGER,
             nalog REAL,
             salary REAL,
             spent REAL,
             officeSalary REAL,
             salarySuper REAL,
-            salaryDirector REAL,
             salaryTraffic REAL,
             total REAL
         )
@@ -270,7 +268,7 @@ def update_ladder():
             total = rounder(officeSalary - spent - salarySuper - salaryTraffic, 0)
 
             # Update the calculation in the database
-            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryTraffic, total, calculation_id))
 
         conn.commit()
         conn.close()
@@ -340,8 +338,8 @@ def get_defaults():
     row = cursor.fetchone()
     conn.close()
     return jsonify({
-        "super-default": row[14],
-        "traffic-default": row[15]
+        "super-default": row[7],
+        "traffic-default": row[8]
     })
 
 @app.route('/get_ladder', methods=['GET'])
