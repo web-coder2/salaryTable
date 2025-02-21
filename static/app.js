@@ -40,6 +40,7 @@ createApp({
             showMonthlyTable: false,
             showYearlyTable: false,
             isAdding: false,
+            api_route: "http://localhost:5000/"  // перед продом поменять на http://31.130.151.240:5000/
         };
     },
     mounted() {
@@ -149,7 +150,9 @@ createApp({
         async addRecord() {
             this.isAdding = true;
             try {
-                const response = await axios.post('http://31.130.151.240:5000/calculate', {
+                // для разработки будем использовать localhost:5000
+                // а для продакшена 31.130.151.240:5000
+                const response = await axios.post(this.api_route + 'calculate', {
                     ...this.formData,
                     ...this.defaultValues
                 });
@@ -174,7 +177,7 @@ createApp({
                   const jsonData = JSON.parse(e.target.result);
                   for (const item of jsonData) { // Используйте цикл for...of для ожидания каждого запроса
                     console.log(item);
-                    const response = await axios.post('http://31.130.151.240:5000/calculate', {
+                    const response = await axios.post(this.api_route + 'calculate', {
                         date: item["Дата"],
                         defaultDirector: this.defaultValues['defaultDirector'],
                         defaultSuper: this.defaultValues['defaultSuper'],
@@ -207,7 +210,7 @@ createApp({
         },
         async updateDefaults() {
             try {
-                const response = await axios.post('http://31.130.151.240:5000/update_defaults', this.defaultValues);
+                const response = await axios.post(this.api_route + 'update_defaults', this.defaultValues);
                 if (response.status === 200) {
                     alert('Значения по умолчанию сохранены успешно!');
                     this.fetchCalculations();
@@ -226,7 +229,7 @@ createApp({
                     ladderToSend[parseInt(key)] = this.ladder[key];
                 }
 
-                const response = await axios.post('http://31.130.151.240:5000/update_ladder', ladderToSend);
+                const response = await axios.post(this.api_route + 'update_ladder', ladderToSend);
                 if (response.status === 200) {
                     alert('Лестница сохранена успешно!');
                     this.fetchCalculations();
@@ -240,7 +243,7 @@ createApp({
         },
         async fetchCalculations() {
             try {
-                const response = await axios.get('http://31.130.151.240:5000/get_calculations');
+                const response = await axios.get(this.api_route + 'get_calculations');
                 this.calculations = response.data;
             } catch (error) {
                 console.error('Error fetching calculations:', error);
@@ -248,7 +251,7 @@ createApp({
         },
         async fetchLadder() {
             try {
-                const response = await axios.get('http://31.130.151.240:5000/get_ladder');
+                const response = await axios.get(this.api_route + 'get_ladder');
                 this.ladder = response.data;
             } catch (error) {
                 console.error('Error fetching ladder:', error);
@@ -256,7 +259,7 @@ createApp({
         },
         async fetchDefault() {
             try {
-                const response = await axios.get('http://31.130.151.240:5000/get_defaults')
+                const response = await axios.get(this.api_route + 'get_defaults')
                 this.defaultValues["defaultSuper"] = response.data["super-default"]
                 this.defaultValues["defaultDirector"] = response.data["director-default"]
                 this.defaultValues["defaultTraffic"] = response.data["traffic-default"]
@@ -266,7 +269,7 @@ createApp({
         },
         async deleteCalculation(id) {
             try {
-                const response = await axios.delete(`http://31.130.151.240:5000/delete_calculation/${id}`);
+                const response = await axios.delete(this.api_route + `delete_calculation/${id}`);
                 if (response.status === 200) {
                     console.log(`Calculation with id ${id} deleted successfully`);
                     // Refresh the calculations list
