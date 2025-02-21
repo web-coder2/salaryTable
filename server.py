@@ -8,8 +8,13 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Change this to a random, secure key!
 
-# Явное указание разрешённых параметров CORS
-CORS(app, resources={r"/*": {"origins": "*"}}, methods=['GET', 'POST', 'PUT', 'DELETE'], allow_headers=['Content-Type', 'Authorization'])
+# Добавляем CORS для всех маршрутов
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
 
 
 DATABASE = 'data.db'

@@ -1,2 +1,31 @@
 docker build -t salaryapp .
 docker run -d -p 5000:5000 -v data.db testapp
+
+
+//////////   	ДЛЯ БИЛДА И НА ПРОДАКШЕН /////////////////////
+
+
+cmd (на моем компе)
+
+docker build -t webcoder2/salary-table-app .
+
+docker push webcoder2/salary-table-app
+
+
+
+
+linux (на сервере где будет размешен прод)
+
+docker pull webcoder2/salary-table-app
+docker images   =>>>>  взять images_id имаджа 
+
+docker run -d -p 5000:5000 -v data.db <image_id>
+
+
+перед этим лучше удалить все предыдущие имаджы и контенйенеры (сначала контененйры)
+
+docker ps =>>>>> взять cont_id контпенреа
+
+docker rm --force <cont_id1> <cont_id2> <cont_id(n)>
+
+docker rmi <image_id>
