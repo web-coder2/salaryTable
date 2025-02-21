@@ -40,9 +40,6 @@
             <label for="defaultSuper">Супервайзер (по умолчанию):</label>
             <input type="number" id="defaultSuper" v-model.number="defaultValues.defaultSuper" required><br><br>
 
-            <label for="defaultDirector">Директор (по умолчанию):</label>
-            <input type="number" id="defaultDirector" v-model.number="defaultValues.defaultDirector" required><br><br>
-
             <label for="defaultTraffic">Трафик-менеджер (по умолчанию):</label>
             <input type="number" id="defaultTraffic" v-model.number="defaultValues.defaultTraffic" required><br><br>
 
@@ -55,7 +52,6 @@
                 <thead>
                 <tr>
                     <th>ЛЕСТНИЦА</th>
-                    <th>Директор</th>
                     <th>Супервайзер</th>
                     <th>Трафик-мен</th>
                 </tr>
@@ -63,7 +59,6 @@
                 <tbody>
                 <tr v-for="(ladderRow, ladderValue) in ladder" :key="ladderValue">
                     <td><input class="table-input form-control" type="number" v-model.number="ladder[ladderValue].ladderValue" @change="saveLadder"></td>
-                    <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Директор']" @change="saveLadder"></td>
                     <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Супервайзер']" @change="saveLadder"></td>
                     <td><input class="table-input form-control" type="number" v-model.number="ladderRow['Трафик-менеджер']" @change="saveLadder"></td>
                 </tr>
@@ -72,10 +67,13 @@
             <button @click="saveLadder" class="btn btn-success" style="margin-top: 20px;">Сохранить Лестницу</button>
         </div>
 
-        <h2>Все Записи</h2>
+        <div class="table-info">
+            <h2>Все Записи</h2>
+            <button class="btn btn-danger" @click="sortMode =! sortMode">сортировать по [[ sortMode ? 'возрастанию' : 'убиванию' ]] даты</button>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered entry-table">
-                <thead>
+                <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                 <tr>
                     <th style="white-space: nowrap;">Дата записи</th>
                     <th style="white-space: nowrap;">Робот</th>
@@ -88,7 +86,6 @@
                     <th style="white-space: nowrap;">Потрачено</th>
                     <th style="white-space: nowrap;">ЗП по Офису</th>
                     <th style="white-space: nowrap;">ЗП Супера</th>
-                    <th style="white-space: nowrap;">ЗП Директора</th>
                     <th style="white-space: nowrap;">ЗП Трафик-мена</th>
                     <th style="white-space: nowrap;">Total</th>
                     <th style="white-space: nowrap;">Удалить</th>
@@ -97,7 +94,7 @@
                 <tbody>
                 <tr v-for="calculation in calculations" :key="calculation.id"
                     :style="{ backgroundColor: getTotalColor(calculation.total) }">
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.date]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[formatDate(calculation.date)]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.robot]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.summHold]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.differ]]</td>
@@ -108,7 +105,6 @@
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.spent]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.officeSalary]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salarySuper]]</td>
-                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryDirector]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryTraffic]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.total]]</td>
                     <td>
@@ -200,9 +196,9 @@
         </div>
     </div>
 </div>
-
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="{{ url_for('static', filename='app.js') }}"></script>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

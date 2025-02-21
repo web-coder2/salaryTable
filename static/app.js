@@ -40,7 +40,13 @@ createApp({
             showMonthlyTable: false,
             showYearlyTable: false,
             isAdding: false,
-            api_route: "http://localhost:5000/"  // перед продом поменять на http://31.130.151.240:5000/
+            api_route: "http://localhost:5000/",  // перед продом поменять на http://31.130.151.240:5000/
+            // api_route: "http://31.130.151.240:5000/"
+            monthNames: [
+                "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+            ],
+            sortMode: true, 
         };
     },
     mounted() {
@@ -59,6 +65,7 @@ createApp({
                 const monthYear = `${month} ${year}`;
                 if (!monthlyData[monthYear]) {
                     monthlyData[monthYear] = {
+                        date: date,
                         monthYear: monthYear,
                         salaryTraffic: 0,
                         salarySuper: 0,
@@ -144,6 +151,17 @@ createApp({
                 director: Math.floor(directorSumm),
                 total: Math.floor(total)
             }
+        }
+    },
+    watch: {
+        sortMode() {
+            this.calculations.sort((a, b) => {
+                if (this.sortMode) {
+                    return new Date(b.date) - new Date(a.date);
+                } else {
+                    return new Date(a.date) - new Date(b.date);
+                }
+            });
         }
     },
     methods: {
@@ -241,6 +259,38 @@ createApp({
                 alert('Ошибка при сохранении лестницы.');
             }
         },
+        parseDate(dateString) {
+            const [month, day, year] = dateString.split('.'); // Extract components
+            if (year.length == 2) {
+                return new Date(`20${year}`, month - 1, day);
+            } if (year.length == 4) {
+                return new Date(year, month -1, day)
+            }
+        },
+        formatDate(dateString) {
+            const date = this.parseDate(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 because months are 0-indexed
+            const year = date.getFullYear();
+            const monthName = this.monthNames[date.getMonth()];
+            //return `${day}-${month}-${year} ${monthName}`;
+            return `${day} ${monthName} ${year}`;
+        },
+        sorterByDate(mode) {
+            if (mode == true) {
+                this.calculations.sort((a,b) => {
+                    const dateA = this.parseDate(a.date);
+                    const dateB = this.parseDate(b.date);
+                    return dateA.getTime() - dateB.getTime();
+                })
+            } else {
+                this.calculations.sort((a,b) => {
+                    const dateA = this.parseDate(a.date);
+                    const dateB = this.parseDate(b.date);
+                    return dateB.getTime() - dateA.getTime();
+                })
+            }
+        },
         async fetchCalculations() {
             try {
                 const response = await axios.get(this.api_route + 'get_calculations');
@@ -248,6 +298,11 @@ createApp({
             } catch (error) {
                 console.error('Error fetching calculations:', error);
             }
+            this.calculations.sort((a,b) => {
+                const dateA = this.parseDate(a.date);
+                const dateB = this.parseDate(b.date);
+                return dateB.getTime() - dateA.getTime(); // Для сортировки по убыванию
+            })
         },
         async fetchLadder() {
             try {

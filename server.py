@@ -155,7 +155,6 @@ def calculate():
     oklad = int(data['oklad'])
     office = int(data['office'])
     defaultSuper = int(data['defaultSuper'])
-    defaultDirector = int(data['defaultDirector'])
     defaultTraffic = int(data['defaultTraffic'])
 
     nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 0)
@@ -164,23 +163,21 @@ def calculate():
     officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
     salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
-    salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
     salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
 
     if summHold == 0:
         total = 0
         salarySuper = 0
-        salaryDirector = 0
         salaryTraffic = 0
     else:
-        total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
+        total = round(officeSalary - spent - salarySuper - salaryTraffic)
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total)
+        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryTraffic, total)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total))
+    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryTraffic, total))
     conn.commit()
     conn.close()
 
@@ -207,16 +204,14 @@ def get_calculations():
             'oklad': row[5],
             'office': row[6],
             'defaultSuper': row[7],
-            'defaultDirector': row[8],
-            'defaultTraffic': row[9],
-            'nalog': row[10],
-            'salary': row[11],
-            'spent': row[12],
-            'officeSalary': row[13],
-            'salarySuper': row[14],
-            'salaryDirector': row[15],
-            'salaryTraffic': row[16],
-            'total': row[17]
+            'defaultTraffic': row[8],
+            'nalog': row[9],
+            'salary': row[10],
+            'spent': row[11],
+            'officeSalary': row[12],
+            'salarySuper': row[13],
+            'salaryTraffic': row[14],
+            'total': row[15]
         })
     return jsonify(calculations)
 
@@ -249,7 +244,7 @@ def update_ladder():
         conn = sqlite3.connect(DATABASE)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
+        cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic FROM salary_calculations")
         rows = cursor.fetchall()
 
         def rounder(num, decem):
@@ -259,7 +254,7 @@ def update_ladder():
                 return round(num, decem)
 
         for row in rows:
-            calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
+            calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic = row
 
             # Calculate dependent values
             aproov = 0.6
@@ -270,13 +265,12 @@ def update_ladder():
 
             # Retrieve default values from the database
             salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
-            salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
             salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
 
-            total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+            total = rounder(officeSalary - spent - salarySuper - salaryTraffic, 0)
 
             # Update the calculation in the database
-            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
 
         conn.commit()
         conn.close()
@@ -297,12 +291,11 @@ def update_defaults():
         return jsonify({'error': 'Invalid defaults data format'}), 400
     
     defaultSuper2 = defaults_data["defaultSuper"]
-    defaultDirector2 = defaults_data["defaultDirector"]
     defaultTraffic2 = defaults_data["defaultTraffic"]
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic FROM salary_calculations")
+    cursor.execute("SELECT id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic FROM salary_calculations")
     rows = cursor.fetchall()
 
     def rounder(num, decem):
@@ -313,7 +306,7 @@ def update_defaults():
 
     for row in rows:
 
-        calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
+        calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultTraffic = row
 
         # Calculate dependent values
         aproov = 0.6
@@ -324,13 +317,12 @@ def update_defaults():
 
         # Retrieve default values from the database
         salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper2, 0)
-        salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector2, 0)
         salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic2, 0)
 
-        total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+        total = rounder(officeSalary - spent - salarySuper - salaryTraffic, 0)
 
         # Update the calculation in the database
-        cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+        cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryTraffic, total, calculation_id))
     
     conn.commit()
     conn.close()
@@ -349,8 +341,7 @@ def get_defaults():
     conn.close()
     return jsonify({
         "super-default": row[14],
-        "director-default": row[15],
-        "traffic-default": row[16]
+        "traffic-default": row[15]
     })
 
 @app.route('/get_ladder', methods=['GET'])
@@ -360,4 +351,4 @@ def get_ladder():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
