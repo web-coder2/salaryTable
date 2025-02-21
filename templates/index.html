@@ -133,7 +133,7 @@
                 <button @click="toggleMonthlyTable" class="btn btn-info" style="margin-top: 20px;">
                     [[ showMonthlyTable ? 'скрыть за месяц' : 'показать за месяц' ]]
                 </button>
-                <div class="table-responsive">
+                <!--<div class="table-responsive">
                     <table v-if="showMonthlyTable" class="table table-bordered">
                         <thead style="position: sticky; top: 0px;">
                         <tr>
@@ -161,7 +161,38 @@
                         </tr>
                         </tbody>
                     </table>
+                </div>-->
+                <div v-for="yearData in monthlyCalculations" :key="yearData.year" v-if="showMonthlyTable" class="table-responsive">
+                    <h2 style="color: greenyellow;">[[ yearData.year ]]</h2>
+                    <table class="table table-bordered">
+                        <thead style="position: sticky; top: 0px;">
+                        <tr>
+                            <th>Месяц</th>
+                            <th>Зарплата Трафик</th>
+                            <th>Зарплата Супер</th>
+                            <th>Зарплата Директор</th>
+                            <th>Итого</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber">
+                            <td>[[ monthData.month ]]</td>
+                            <td>[[ monthData.salaryTraffic ]]</td>
+                            <td>[[ monthData.salarySuper ]]</td>
+                            <td>[[ monthData.salaryDirector ]]</td>
+                            <td :style="{ backgroundColor: getTotalColor(monthData.total) }">[[ monthData.total ]]</td>
+                        </tr>
+                        <tr class="middle-table-td">
+                          <td style="font-weight: bold">Среднее значение</td>
+                          <td style="font-weight: bold">[[ yearData.averageSalaryTraffic.toFixed(2) ]]</td>
+                          <td style="font-weight: bold">[[ yearData.averageSalarySuper.toFixed(2) ]]</td>
+                          <td style="font-weight: bold">[[ yearData.averageSalaryDirector.toFixed(2) ]]</td>
+                          <td style="font-weight: bold">[[ yearData.averageTotal.toFixed(2) ]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
+
             </div>
 
             <div class="grouped-data-section">

@@ -65,30 +65,76 @@ createApp({
             });
         }
     },
-    delimiters: ['[[', ']]'], 
+    delimiters: ['[[', ']]'],
     computed: {
         monthlyCalculations() {
-            const monthlyData = {};
+            const yearlyData = {};
+
             this.calculations.forEach(calc => {
                 const date = new Date(calc.date);
-                const month = date.toLocaleString('default', {month: 'long'});
                 const year = date.getFullYear();
-                const monthYear = `${month} ${year}`;
-                if (!monthlyData[monthYear]) {
-                    monthlyData[monthYear] = {
-                        monthYear: monthYear,
-                        salaryTraffic: 0,
-                        salarySuper: 0,
-                        salaryDirector: 0,
-                        total: 0
+                const month = date.getMonth(); // Get month as a number (0-11)
+                const monthName = this.monthNames[month];
+                const monthYear = `${monthName} ${year}`;
+
+                if (!yearlyData[year]) {
+                    yearlyData[year] = {
+                        year: year,
+                        months: Array(12).fill(null).map((_, i) => ({ // Pre-populate with 12 months
+                            month: this.monthNames[i],
+                            monthNumber: i,
+                            salaryTraffic: 0,
+                            salarySuper: 0,
+                            salaryDirector: 0,
+                            total: 0,
+                            count: 0  // Initialize count
+                        })),
+                        totalSalaryTraffic: 0,
+                        totalSalarySuper: 0,
+                        totalSalaryDirector: 0,
+                        totalTotal: 0,
+                        totalMonths: 0
                     };
                 }
-                monthlyData[monthYear].salaryTraffic += calc.salaryTraffic;
-                monthlyData[monthYear].salarySuper += calc.salarySuper;
-                monthlyData[monthYear].salaryDirector += calc.salaryDirector;
-                monthlyData[monthYear].total += calc.total;
+
+                yearlyData[year].months[month].salaryTraffic += calc.salaryTraffic;
+                yearlyData[year].months[month].salarySuper += calc.salarySuper;
+                yearlyData[year].months[month].salaryDirector += calc.salaryDirector;
+                yearlyData[year].months[month].total += calc.total;
+                yearlyData[year].months[month].count++; // Increment count
+
+                yearlyData[year].totalSalaryTraffic += calc.salaryTraffic;
+                yearlyData[year].totalSalarySuper += calc.salarySuper;
+                yearlyData[year].totalSalaryDirector += calc.salaryDirector;
+                yearlyData[year].totalTotal += calc.total;
+                yearlyData[year].totalMonths++;
             });
-            return Object.values(monthlyData);
+
+            // Convert the yearlyData object into an array of years
+            const result = Object.values(yearlyData).map(yearData => {
+
+                //Calculate averages
+                const numberOfMonths = yearData.totalMonths;
+
+                const averageSalaryTraffic = numberOfMonths > 0 ? yearData.totalSalaryTraffic / numberOfMonths : 0;
+                const averageSalarySuper = numberOfMonths > 0 ? yearData.totalSalarySuper / numberOfMonths : 0;
+                const averageSalaryDirector = numberOfMonths > 0 ? yearData.totalSalaryDirector / numberOfMonths : 0;
+                const averageTotal = numberOfMonths > 0 ? yearData.totalTotal / numberOfMonths : 0;
+
+                return {
+                    year: yearData.year,
+                    months: yearData.months,  // Months are already pre-populated and will be 0 if no data
+                    averageSalaryTraffic: averageSalaryTraffic,
+                    averageSalarySuper: averageSalarySuper,
+                    averageSalaryDirector: averageSalaryDirector,
+                    averageTotal: averageTotal
+                };
+            });
+
+            // Sort years in descending order (newest first)
+            result.sort((a, b) => b.year - a.year);
+
+            return result;
         },
         yearlyCalculations() {
             const yearlyData = {};
@@ -117,17 +163,23 @@ createApp({
             let directorSumm = 0;
             let total = 0
 
-            for (let item in this.monthlyCalculations) {
-                traficSumm += this.monthlyCalculations[item].salaryTraffic;
-                superSumm += this.monthlyCalculations[item].salarySuper;
-                directorSumm += this.monthlyCalculations[item].salaryDirector;
-                total += this.monthlyCalculations[item].total;
-            }
+            let monthCount = 0;
 
-            traficSumm = traficSumm / this.monthlyCalculations.length
-            superSumm = superSumm / this.monthlyCalculations.length
-            directorSumm = directorSumm / this.monthlyCalculations.length
-            total = total / this.monthlyCalculations.length
+            this.monthlyCalculations.forEach(yearData => {
+                yearData.months.forEach(monthData => {
+                    traficSumm += monthData.salaryTraffic;
+                    superSumm += monthData.salarySuper;
+                    directorSumm += monthData.salaryDirector;
+                    total += monthData.total;
+                    monthCount++;
+                });
+            });
+
+
+            traficSumm = monthCount > 0 ? traficSumm / monthCount : 0;
+            superSumm = monthCount > 0 ? superSumm / monthCount : 0;
+            directorSumm = monthCount > 0 ? directorSumm / monthCount : 0;
+            total = monthCount > 0 ? total / monthCount : 0;
 
             return {
                 trafic: Math.floor(traficSumm),
@@ -249,7 +301,7 @@ createApp({
               reader.readAsText(file);
             }
           },
-      
+
         resetForm() {
             this.formData = {
                 date: '',
