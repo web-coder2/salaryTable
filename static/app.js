@@ -75,7 +75,6 @@ createApp({
                 const year = date.getFullYear();
                 const month = date.getMonth(); // Get month as a number (0-11)
                 const monthName = this.monthNames[month];
-                const monthYear = `${monthName} ${year}`;
 
                 if (!yearlyData[year]) {
                     yearlyData[year] = {
@@ -87,13 +86,23 @@ createApp({
                             salarySuper: 0,
                             salaryDirector: 0,
                             total: 0,
-                            count: 0  // Initialize count
+                            count: 0,  // Initialize count,
+                            robot: 0,
+                            summHold: 0,
+                            differ: 0,
+                            oklad: 0,
+                            office: 0
                         })),
                         totalSalaryTraffic: 0,
                         totalSalarySuper: 0,
                         totalSalaryDirector: 0,
                         totalTotal: 0,
-                        totalMonths: 0
+                        totalMonthsWithData: 0,
+                        totalRobot: 0,
+                        totalSummHold: 0,
+                        totalDiffer: 0,
+                        totalOklad: 0,
+                        totalOffice: 0
                     };
                 }
 
@@ -101,25 +110,45 @@ createApp({
                 yearlyData[year].months[month].salarySuper += calc.salarySuper;
                 yearlyData[year].months[month].salaryDirector += calc.salaryDirector;
                 yearlyData[year].months[month].total += calc.total;
+                yearlyData[year].months[month].robot += calc.robot;
+                yearlyData[year].months[month].summHold += calc.summHold;
+                yearlyData[year].months[month].differ += calc.differ;
+                yearlyData[year].months[month].oklad += calc.oklad;
+                yearlyData[year].months[month].office += calc.office;
                 yearlyData[year].months[month].count++; // Increment count
 
                 yearlyData[year].totalSalaryTraffic += calc.salaryTraffic;
                 yearlyData[year].totalSalarySuper += calc.salarySuper;
                 yearlyData[year].totalSalaryDirector += calc.salaryDirector;
                 yearlyData[year].totalTotal += calc.total;
-                yearlyData[year].totalMonths++;
+                yearlyData[year].totalRobot += calc.robot;
+                yearlyData[year].totalSummHold += calc.summHold;
+                yearlyData[year].totalDiffer += calc.differ;
+                yearlyData[year].totalOklad += calc.oklad;
+                yearlyData[year].totalOffice += calc.office;
+
             });
 
             // Convert the yearlyData object into an array of years
             const result = Object.values(yearlyData).map(yearData => {
 
-                //Calculate averages
-                const numberOfMonths = yearData.totalMonths;
+                let monthsWithData = 0;
+                yearData.months.forEach(month => {
+                    if (month.count > 0) {
+                        monthsWithData++;
+                    }
+                });
 
-                const averageSalaryTraffic = numberOfMonths > 0 ? yearData.totalSalaryTraffic / numberOfMonths : 0;
-                const averageSalarySuper = numberOfMonths > 0 ? yearData.totalSalarySuper / numberOfMonths : 0;
-                const averageSalaryDirector = numberOfMonths > 0 ? yearData.totalSalaryDirector / numberOfMonths : 0;
-                const averageTotal = numberOfMonths > 0 ? yearData.totalTotal / numberOfMonths : 0;
+                const averageSalaryTraffic = monthsWithData > 0 ? yearData.totalSalaryTraffic / monthsWithData : 0;
+                const averageSalarySuper = monthsWithData > 0 ? yearData.totalSalarySuper / monthsWithData : 0;
+                const averageSalaryDirector = monthsWithData > 0 ? yearData.totalSalaryDirector / monthsWithData : 0;
+                const averageTotal = monthsWithData > 0 ? yearData.totalTotal / monthsWithData : 0;
+                const averageRobot = monthsWithData > 0 ? yearData.totalRobot / monthsWithData : 0;
+                const averageSummHold = monthsWithData > 0 ? yearData.totalSummHold / monthsWithData : 0;
+                const averageDiffer = monthsWithData > 0 ? yearData.totalDiffer / monthsWithData : 0;
+                const averageOklad = monthsWithData > 0 ? yearData.totalOklad / monthsWithData : 0;
+                const averageOffice = monthsWithData > 0 ? yearData.totalOffice / monthsWithData : 0;
+
 
                 return {
                     year: yearData.year,
@@ -127,7 +156,21 @@ createApp({
                     averageSalaryTraffic: averageSalaryTraffic,
                     averageSalarySuper: averageSalarySuper,
                     averageSalaryDirector: averageSalaryDirector,
-                    averageTotal: averageTotal
+                    averageTotal: averageTotal,
+                    averageRobot: averageRobot,
+                    averageSummHold: averageSummHold,
+                    averageDiffer: averageDiffer,
+                    averageOklad: averageOklad,
+                    averageOffice: averageOffice,
+                    totalSalaryTraffic: yearData.totalSalaryTraffic,
+                    totalSalarySuper: yearData.totalSalarySuper,
+                    totalSalaryDirector:  yearData.totalSalaryDirector,
+                    totalTotal: yearData.totalTotal,
+                    totalRobot: yearData.totalRobot,
+                    totalSummHold: yearData.totalSummHold,
+                    totalDiffer: yearData.totalDiffer,
+                    totalOklad: yearData.totalOklad,
+                    totalOffice: yearData.totalOffice,
                 };
             });
 

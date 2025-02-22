@@ -309,3 +309,15 @@ input[type="file"] {
   background-color: #44185a;
   color: white;
 }
+
+.table-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .table-info {
+    display: block;
+  }
+}
