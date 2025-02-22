@@ -46,7 +46,12 @@ def create_table():
             salarySuper REAL,
             salaryDirector REAL,
             salaryTraffic REAL,
-            total REAL
+            total REAL,
+            salarySuper2 REAL,
+            salaryDirector2 REAL,
+            salaryTraffic2 REAL,
+            total2 REAL
+
         )
     ''')
     conn.commit()
@@ -75,30 +80,79 @@ LADDER = {
 }
 
 
-def lookup_ladder(office_salary, role, date):
-    keys = sorted(LADDER.keys())
-    try:
-        date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
-    except:
+LADDER2 = {
+    0: {'ladderValue': 0, 'Директор': 0, 'Супервайзер': 2100, 'Трафик-менеджер': 1400},
+    20000: {'ladderValue': 20000, 'Директор': 0, 'Супервайзер': 2600, 'Трафик-менеджер': 1700},
+    40000: {'ladderValue': 40000, 'Директор': 0, 'Супервайзер': 3150, 'Трафик-менеджер': 2050},
+    60000: {'ladderValue': 60000, 'Директор': 0, 'Супервайзер': 3750, 'Трафик-менеджер': 2450},
+    80000: {'ladderValue': 80000, 'Директор': 0, 'Супервайзер': 4400, 'Трафик-менеджер': 2900},
+    100000: {'ladderValue': 100000, 'Директор': 0, 'Супервайзер': 5100, 'Трафик-менеджер': 3400},
+    120000: {'ladderValue': 120000, 'Директор': 0, 'Супервайзер': 5850, 'Трафик-менеджер': 3950},
+    140000: {'ladderValue': 140000, 'Директор': 0, 'Супервайзер': 6650, 'Трафик-менеджер': 4550},
+    160000: {'ladderValue': 160000, 'Директор': 0, 'Супервайзер': 7500, 'Трафик-менеджер': 5200},
+    180000: {'ladderValue': 180000, 'Директор': 0, 'Супервайзер': 8400, 'Трафик-менеджер': 5900},
+    200000: {'ladderValue': 200000, 'Директор': 0, 'Супервайзер': 9350, 'Трафик-менеджер': 6650},
+    220000: {'ladderValue': 220000, 'Директор': 0, 'Супервайзер': 10350, 'Трафик-менеджер': 7450},
+    240000: {'ladderValue': 240000, 'Директор': 0, 'Супервайзер': 11400, 'Трафик-менеджер': 8300},
+    260000: {'ladderValue': 260000, 'Директор': 0, 'Супервайзер': 12500, 'Трафик-менеджер': 9200},
+    280000: {'ladderValue': 280000, 'Директор': 0, 'Супервайзер': 13650, 'Трафик-менеджер': 10200},
+    300000: {'ladderValue': 300000, 'Директор': 0, 'Супервайзер': 14850, 'Трафик-менеджер': 11250}
+}
+
+def lookup_ladder(office_salary, role, date, ladderAge):
+    if ladderAge == 'new':
+
+        keys = sorted(LADDER.keys())
+
         try:
-            date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
+            date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
         except:
-            date = datetime.datetime.strptime(date, '%m.%d.%Y').date() 
-    if date.weekday() < 5:
-        for i in range(len(keys) - 1):
-            if keys[i] <= office_salary < keys[i + 1]:
-                return LADDER[keys[i]][role]
-        if office_salary >= keys[-1]:
-            return LADDER[keys[-1]][role]
-        return LADDER[keys[0]][role]
-    if date.weekday() >= 5 and office_salary >= 20000:  # если работали в суботу или вскренье И зп офсиа была от 20к
-        # при работе в выходные дни будет сетка + 1
-        for i in range(len(keys) - 1):
-            if keys[i] <= office_salary < keys[i + 1]:
-                return LADDER[keys[i + 1]][role]
-        if office_salary >= keys[-1]:
-            return LADDER[keys[-1]][role]
-        return LADDER[keys[1]][role]
+            try:
+                date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
+            except:
+                date = datetime.datetime.strptime(date, '%m.%d.%Y').date() 
+        if date.weekday() < 5:
+            for i in range(len(keys) - 1):
+                if keys[i] <= office_salary < keys[i + 1]:
+                    return LADDER[keys[i]][role]
+            if office_salary >= keys[-1]:
+                return LADDER[keys[-1]][role]
+            return LADDER[keys[0]][role]
+        if date.weekday() >= 5 and office_salary >= 20000:  # если работали в суботу или вскренье И зп офсиа была от 20к
+            # при работе в выходные дни будет сетка + 1
+            for i in range(len(keys) - 1):
+                if keys[i] <= office_salary < keys[i + 1]:
+                    return LADDER[keys[i + 1]][role]
+            if office_salary >= keys[-1]:
+                return LADDER[keys[-1]][role]
+            return LADDER[keys[1]][role]
+
+    if ladderAge == "old":
+
+        keys = sorted(LADDER2.keys())
+
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d').date()   # он будет работать хорошо при заполнения с датой вручную
+        except:
+            try:
+                date = datetime.datetime.strptime(date, '%m.%d.%y').date()  # а она удет хорошо работать при заполенния данных через JSON файл
+            except:
+                date = datetime.datetime.strptime(date, '%m.%d.%Y').date() 
+        if date.weekday() < 5:
+            for i in range(len(keys) - 1):
+                if keys[i] <= office_salary < keys[i + 1]:
+                    return LADDER2[keys[i]][role]
+            if office_salary >= keys[-1]:
+                return LADDER2[keys[-1]][role]
+            return LADDER2[keys[0]][role]
+        if date.weekday() >= 5 and office_salary >= 20000:  # если работали в суботу или вскренье И зп офсиа была от 20к
+            # при работе в выходные дни будет сетка + 1
+            for i in range(len(keys) - 1):
+                if keys[i] <= office_salary < keys[i + 1]:
+                    return LADDER2[keys[i + 1]][role]
+            if office_salary >= keys[-1]:
+                return LADDER2[keys[-1]][role]
+            return LADDER2[keys[1]][role]
 
 
 def login_required(f):
@@ -163,25 +217,35 @@ def calculate():
     spent = rounder(robot + oklad + office + nalog + salary, 0)
     officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
-    salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
-    #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
-    salaryDirector = 0
-    salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
+    salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'new') if officeSalary - spent > 0 else defaultSuper, 0)
+    salaryDirector = 0 #rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'new') if officeSalary - spent > 0 else defaultDirector, 0)
+    salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'new') if officeSalary - spent > 0 else defaultTraffic, 0)
+
+    salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary- spent > 0 else defaultSuper, 0)
+    salaryDirector2 = 0 #rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector, 0)
+    salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic, 0)
+
 
     if summHold == 0:
         total = 0
         salarySuper = 0
         salaryDirector = 0
         salaryTraffic = 0
+
+        total2 = 0
+        salarySuper2 = 0
+        salaryDirector2 = 0
+        salaryTraffic2 = 0
     else:
         total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
+        total2 = round(officeSalary - spent - salaryDirector2 - salarySuper2 - salaryTraffic2)
 
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total))
+        INSERT INTO salary_calculations (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic, nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2)) # добавил ?,?,?,?,
     conn.commit()
     conn.close()
 
@@ -217,7 +281,11 @@ def get_calculations():
             'salarySuper': row[14],
             'salaryDirector': row[15],
             'salaryTraffic': row[16],
-            'total': row[17]
+            'total': row[17],
+            'salarySuper2': row[18],
+            'salaryDirector2': row[19],
+            'salaryTraffic2': row[20],
+            'total2': row[21]
         })
     return jsonify(calculations)
 
@@ -270,15 +338,26 @@ def update_ladder():
             officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
             # Retrieve default values from the database
-            salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper, 0)
-            #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector, 0)
+            salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'new') if officeSalary - spent > 0 else defaultSuper, 0)
+            #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'new') if officeSalary - spent > 0 else defaultDirector, 0)
             salaryDirector = 0
-            salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic, 0)
+            salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'new') if officeSalary - spent > 0 else defaultTraffic, 0)
 
             total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
+
+            salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else defaultSuper, 0)
+            #salaryDirector2 = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector, 0)
+            salaryDirector2 = 0
+
+            salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic, 0)
+
+            total2 = rounder(officeSalary - spent - salaryDirector2 - salarySuper2 - salaryTraffic2, 0)
+
+
+
             # Update the calculation in the database
-            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+            cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ?, salarySuper2 = ?, salaryDirector2 = ?, salaryTraffic2 = ?, total2 = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2, calculation_id))
 
         conn.commit()
         conn.close()
@@ -325,15 +404,22 @@ def update_defaults():
         officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
         # Retrieve default values from the database
-        salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date) if officeSalary - spent > 0 else defaultSuper2, 0)
-        #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date) if officeSalary - spent > 0 else defaultDirector2, 0)
+        salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'new') if officeSalary - spent > 0 else defaultSuper2, 0)
+        #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'new') if officeSalary - spent > 0 else defaultDirector2, 0)
         salaryDirector = 0
-        salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date) if officeSalary - spent > 0 else defaultTraffic2, 0)
+        salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'new') if officeSalary - spent > 0 else defaultTraffic2, 0)
 
         total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
+        salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else defaultSuper2, 0)
+        #salaryDirector2 = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector2, 0)
+        salaryDirector2 = 0
+        salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic2, 0)
+
+        total2 = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+
         # Update the calculation in the database
-        cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, calculation_id))
+        cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ?, salarySuper2 = ?, salaryDirector2 = ?, salaryTraffic2 = ?, total2 = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2, calculation_id))
     
     conn.commit()
     conn.close()
@@ -350,11 +436,19 @@ def get_defaults():
     cursor.execute("SELECT * FROM salary_calculations LIMIT 1")
     row = cursor.fetchone()
     conn.close()
-    return jsonify({
-        "super-default": row[14],
-        "director-default": row[15],
-        "traffic-default": row[16]
-    })
+
+    if row:
+        return jsonify({
+            "super-default": row[7],
+            "director-default": row[8],
+            "traffic-default": row[9] 
+        })
+    else:
+        return jsonify({
+            "super-default": 0,
+            "director-default": 0,
+            "traffic-default": 0
+        })
 
 @app.route('/get_ladder', methods=['GET'])
 @login_required

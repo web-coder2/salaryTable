@@ -123,7 +123,7 @@ input[type="password"] {
 
 .table-responsive {
   overflow-x: auto;
-  max-height: 600px;   /* Maximum height for the table */
+  max-height: 300px;   /* Maximum height for the table */
   overflow-y: auto;    /* Enable vertical scroll */
 }
 
