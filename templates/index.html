@@ -128,6 +128,56 @@
             </table>
         </div>
 
+
+        <div class="table-responsive" style="margin-top: 30px;">
+            <h4>По старой сетке</h4>
+            <table class="table table-bordered entry-table">
+                <thead style="position: sticky; top: 0px;">
+                <tr>
+                    <th style="white-space: nowrap;">Дата записи</th>
+                    <th style="white-space: nowrap;">Робот</th>
+                    <th style="white-space: nowrap;">Сумма Hold</th>
+                    <th style="white-space: nowrap;">Разница</th>
+                    <th style="white-space: nowrap;">Оклад</th>
+                    <th style="white-space: nowrap;">Офис</th>
+                    <th style="white-space: nowrap;">Налог</th>
+                    <th style="white-space: nowrap;">Зарплата</th>
+                    <th style="white-space: nowrap;">Потрачено</th>
+                    <th style="white-space: nowrap;">ЗП по Офису</th>
+                    <th style="white-space: nowrap;">ЗП Супера</th>
+                    <th style="white-space: nowrap;">ЗП Директора</th>
+                    <th style="white-space: nowrap;">ЗП Трафик-мена</th>
+                    <th style="white-space: nowrap;">Total</th>
+                    <th style="white-space: nowrap;">Удалить</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="calculation in calculations" :key="calculation.id"
+                    :style="{ backgroundColor: getTotalColor(calculation.total2) }">
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[formatDate(calculation.date)]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.robot]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.summHold]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.differ]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.oklad]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.office]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.nalog]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salary]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.spent]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.officeSalary]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salarySuper2]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryDirector2]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.salaryTraffic2]]</td>
+                    <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.total2]]</td>
+                    <td>
+                        <button @click="deleteCalculation(calculation.id)" class="btn btn-danger btn-sm delete-button">Удалить</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
         <div class="grouped-tables-container">
             <div class="grouped-data-section">
                 <button @click="toggleMonthlyTable" class="btn btn-info" style="margin-top: 20px;">
@@ -211,6 +261,63 @@
                             <td style="font-weight: bold">[[ yearData.totalOklad.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalOffice.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalTotal.toFixed(2) ]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!-- Другие таблицы, использующие yearData -->
+                </div>
+
+                <h4 style="font-weight: bold; color: red;" v-if="showMonthlyTable">таблица с среднеми по месяцам по старой сетке</h4>
+
+                <div v-for="yearData in monthlyCalculations" :key="yearData.year" class="table-responsive" style="margin-top: 20px;">
+                    <!--<h2 v-if="showMonthlyTable" style="color: green; position: relative; top: 0px;">[[ yearData.year ]]</h2>-->
+                    <table v-if="showMonthlyTable" class="table table-bordered" style="margin-top: 20px;">
+                        <thead>
+                        <tr style="position: sticky; top: 0px; background-color: #515151;">
+                            <th>Месяц <span style="color: green;">([[ yearData.year ]] год)</span></th>
+                            <th>Зарплата Трафик</th>
+                            <th>Зарплата Супер</th>
+                            <th>Робот</th>
+                            <th>Сумма HOLD</th>
+                            <th>Разница</th>
+                            <th>Оклад</th>
+                            <th>Офис</th>
+                            <th>Итого</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber">
+                            <td>[[ monthData.month ]]</td>
+                            <td>[[ monthData.salaryTraffic2 ]]</td>
+                            <td>[[ monthData.salarySuper2 ]]</td>
+                            <td>[[ monthData.robot ]]</td>
+                            <td>[[ monthData.summHold ]]</td>
+                            <td>[[ monthData.differ ]]</td>
+                            <td>[[ monthData.oklad ]]</td>
+                            <td>[[ monthData.office ]]</td>
+                            <td :style="{ backgroundColor: getTotalColor(monthData.total) }">[[ monthData.total2 ]]</td>
+                        </tr>
+                        <tr class="middle-table-td2">
+                            <td style="font-weight: bold">Среднее значение</td>
+                            <td style="font-weight: bold">[[ yearData.averageSalaryTraffic2.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageSalarySuper2.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageRobot.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageSummHold.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageDiffer.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageOklad.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageOffice.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageTotal2.toFixed(2) ]]</td>
+                        </tr>
+                        <tr class="middle-table-td">
+                            <td style="font-weight: bold">Итого за год</td>
+                            <td style="font-weight: bold">[[ yearData.totalSalaryTraffic2.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalSalarySuper2.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalRobot.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalSummHold.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalDiffer.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalOklad.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalOffice.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalTotal2.toFixed(2) ]]</td>
                         </tr>
                         </tbody>
                     </table>

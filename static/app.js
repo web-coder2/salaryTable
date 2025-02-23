@@ -91,7 +91,11 @@ createApp({
                             summHold: 0,
                             differ: 0,
                             oklad: 0,
-                            office: 0
+                            office: 0,
+                            salaryTraffic2: 0,
+                            salaryDirector2: 0,
+                            salarySuper2: 0,
+                            total2: 0
                         })),
                         totalSalaryTraffic: 0,
                         totalSalarySuper: 0,
@@ -102,13 +106,23 @@ createApp({
                         totalSummHold: 0,
                         totalDiffer: 0,
                         totalOklad: 0,
-                        totalOffice: 0
+                        totalOffice: 0,
+                        totalSalarySuper2: 0,
+                        totalSalaryDirector2: 0,
+                        totalSalaryTraffic2: 0,
+                        totalTotal2: 0
                     };
                 }
 
                 yearlyData[year].months[month].salaryTraffic += calc.salaryTraffic;
                 yearlyData[year].months[month].salarySuper += calc.salarySuper;
                 yearlyData[year].months[month].salaryDirector += calc.salaryDirector;
+                // для старой сетки тут будет //
+                yearlyData[year].months[month].salarySuper2 += calc.salarySuper2
+                yearlyData[year].months[month].salaryTraffic2 += calc.salaryTraffic2
+                yearlyData[year].months[month].salaryDirector2 += calc.salaryDirector2
+                yearlyData[year].months[month].totalTotal2 += calc.total2
+                // вот здесь закончится )))  //
                 yearlyData[year].months[month].total += calc.total;
                 yearlyData[year].months[month].robot += calc.robot;
                 yearlyData[year].months[month].summHold += calc.summHold;
@@ -117,6 +131,13 @@ createApp({
                 yearlyData[year].months[month].office += calc.office;
                 yearlyData[year].months[month].count++; // Increment count
 
+                // а точно также //
+                yearlyData[year].totalSalaryTraffic2 += calc.salaryTraffic2
+                yearlyData[year].totalSalaryDirector2 += calc.salaryDirector2
+                yearlyData[year].totalSalarySuper2 += calc.salarySuper2
+                yearlyData[year].totalTotal2 += calc.total2
+                // да ПИЗДА //
+                
                 yearlyData[year].totalSalaryTraffic += calc.salaryTraffic;
                 yearlyData[year].totalSalarySuper += calc.salarySuper;
                 yearlyData[year].totalSalaryDirector += calc.salaryDirector;
@@ -149,10 +170,18 @@ createApp({
                 const averageOklad = monthsWithData > 0 ? yearData.totalOklad / monthsWithData : 0;
                 const averageOffice = monthsWithData > 0 ? yearData.totalOffice / monthsWithData : 0;
 
+                // тут я тоже все для старйо сетки делаю
+
+                const averageTotal2 = monthsWithData > 0 ? yearData.totalTotal2 / monthsWithData : 0;
+                const averageSalaryTraffic2 = monthsWithData > 0 ? yearData.totalSalaryTraffic2 / monthsWithData : 0;
+                const averageSalarySuper2 = monthsWithData > 0 ? yearData.totalSalarySuper2 / monthsWithData : 0;
+                const averageSalaryDirector2 = monthsWithData > 0 ? yearData.totalSalaryDirector2 / monthsWithData : 0;
 
                 return {
                     year: yearData.year,
                     months: yearData.months,  // Months are already pre-populated and will be 0 if no data
+
+                    // возвращать средняя значения для таблицы
                     averageSalaryTraffic: averageSalaryTraffic,
                     averageSalarySuper: averageSalarySuper,
                     averageSalaryDirector: averageSalaryDirector,
@@ -162,10 +191,23 @@ createApp({
                     averageDiffer: averageDiffer,
                     averageOklad: averageOklad,
                     averageOffice: averageOffice,
+                    averageTotal2: averageTotal2,
+                    averageSalarySuper2: averageSalarySuper2,
+                    averageSalaryDirector2: averageSalaryDirector2,
+                    averageSalaryTraffic2: averageSalaryTraffic2,
+
+
+                    // овзвращает тотал значения для таблицу
                     totalSalaryTraffic: yearData.totalSalaryTraffic,
                     totalSalarySuper: yearData.totalSalarySuper,
                     totalSalaryDirector:  yearData.totalSalaryDirector,
                     totalTotal: yearData.totalTotal,
+
+                    totalSalaryTraffic2: yearData.totalSalaryTraffic2,
+                    totalSalarySuper2: yearData.totalSalarySuper2,
+                    totalSalaryDirector2:  yearData.totalSalaryDirector2,
+                    totalTotal2: yearData.totalTotal2,
+
                     totalRobot: yearData.totalRobot,
                     totalSummHold: yearData.totalSummHold,
                     totalDiffer: yearData.totalDiffer,
