@@ -267,7 +267,7 @@
                     <!-- Другие таблицы, использующие yearData -->
                 </div>
 
-                <h4 style="font-weight: bold; color: red;" v-if="showMonthlyTable">таблица с среднеми по месяцам по старой сетке</h4>
+                <h2 style="font-weight: bold; color: red;" v-if="showMonthlyTable">таблица с среднеми по месяцам по старой сетке</h2>
 
                 <div v-for="yearData in monthlyCalculations" :key="yearData.year" class="table-responsive" style="margin-top: 20px;">
                     <!--<h2 v-if="showMonthlyTable" style="color: green; position: relative; top: 0px;">[[ yearData.year ]]</h2>-->
