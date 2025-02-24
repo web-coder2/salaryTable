@@ -229,7 +229,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber">
+                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total) }">
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic ]]</td>
                             <td>[[ monthData.salarySuper ]]</td>
@@ -238,7 +238,7 @@
                             <td>[[ monthData.differ ]]</td>
                             <td>[[ monthData.oklad ]]</td>
                             <td>[[ monthData.office ]]</td>
-                            <td :style="{ backgroundColor: getTotalColor(monthData.total) }">[[ monthData.total ]]</td>
+                            <td>[[ monthData.total ]]</td>
                         </tr>
                         <tr class="middle-table-td2">
                             <td style="font-weight: bold">Среднее значение</td>
@@ -286,7 +286,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber">
+                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total2) }">
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic2 ]]</td>
                             <td>[[ monthData.salarySuper2 ]]</td>
@@ -295,7 +295,7 @@
                             <td>[[ monthData.differ ]]</td>
                             <td>[[ monthData.oklad ]]</td>
                             <td>[[ monthData.office ]]</td>
-                            <td :style="{ backgroundColor: getTotalColor(monthData.total) }">[[ monthData.total2 ]]</td>
+                            <td>[[ monthData.total2 ]]</td>
                         </tr>
                         <tr class="middle-table-td2">
                             <td style="font-weight: bold">Среднее значение</td>

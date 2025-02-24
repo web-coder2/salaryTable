@@ -49,10 +49,12 @@ createApp({
             sortMode: true,
         };
     },
-    mounted() {
-        this.fetchCalculations();
-        this.fetchDefault()
-        this.fetchLadder();
+    async mounted() {
+        await this.fetchCalculations();
+        await this.fetchDefault()
+        await this.fetchLadder();
+
+        console.log(this.monthlyCalculations)
     },
      watch: {
         sortMode() {
@@ -121,7 +123,7 @@ createApp({
                 yearlyData[year].months[month].salarySuper2 += calc.salarySuper2
                 yearlyData[year].months[month].salaryTraffic2 += calc.salaryTraffic2
                 yearlyData[year].months[month].salaryDirector2 += calc.salaryDirector2
-                yearlyData[year].months[month].totalTotal2 += calc.total2
+                yearlyData[year].months[month].total2 += calc.total2
                 // вот здесь закончится )))  //
                 yearlyData[year].months[month].total += calc.total;
                 yearlyData[year].months[month].robot += calc.robot;
@@ -137,7 +139,7 @@ createApp({
                 yearlyData[year].totalSalarySuper2 += calc.salarySuper2
                 yearlyData[year].totalTotal2 += calc.total2
                 // да ПИЗДА //
-                
+                    
                 yearlyData[year].totalSalaryTraffic += calc.salaryTraffic;
                 yearlyData[year].totalSalarySuper += calc.salarySuper;
                 yearlyData[year].totalSalaryDirector += calc.salaryDirector;
