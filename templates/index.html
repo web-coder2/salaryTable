@@ -274,6 +274,7 @@
                     <table v-if="showMonthlyTable" class="table table-bordered" style="margin-top: 20px;">
                         <thead>
                         <tr style="position: sticky; top: 0px; background-color: #515151;">
+                            <th>Число дней</th>
                             <th>Месяц <span style="color: green;">([[ yearData.year ]] год)</span></th>
                             <th>Зарплата Трафик</th>
                             <th>Зарплата Супер</th>
@@ -287,6 +288,7 @@
                         </thead>
                         <tbody>
                         <tr v-for="monthData in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total2) }">
+                            <td>[[ monthData.count ]]</td>
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic2 ]]</td>
                             <td>[[ monthData.salarySuper2 ]]</td>
@@ -299,6 +301,7 @@
                         </tr>
                         <tr class="middle-table-td2">
                             <td style="font-weight: bold">Среднее значение</td>
+                            <td style="font-weight: bold;">Месяц-Значение</td>
                             <td style="font-weight: bold">[[ yearData.averageSalaryTraffic2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageSalarySuper2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageRobot.toFixed(2) ]]</td>
@@ -310,6 +313,7 @@
                         </tr>
                         <tr class="middle-table-td">
                             <td style="font-weight: bold">Итого за год</td>
+                            <td style="font-weight: bold">Год-Значение</td>
                             <td style="font-weight: bold">[[ yearData.totalSalaryTraffic2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalSalarySuper2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalRobot.toFixed(2) ]]</td>
