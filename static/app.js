@@ -40,8 +40,8 @@ createApp({
             showMonthlyTable: false,
             showYearlyTable: false,
             isAdding: false,
-            api_route: "http://localhost:5000/",  // перед продом поменять на http://31.130.151.240:5000/
-            // api_route: "http://31.130.151.240:5000/"
+            //api_route: "http://localhost:5000/",  // перед продом поменять на http://31.130.151.240:80/
+            api_route: "http://31.130.151.240:80/",
             monthNames: [
                 "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
                 "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -55,6 +55,10 @@ createApp({
         await this.fetchLadder();
 
         console.log(this.monthlyCalculations)
+
+        this.calculations.sort((a, b) => {
+            return new Date(b.date) - new Date(a.date)
+        })
     },
      watch: {
         sortMode() {
