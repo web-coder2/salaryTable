@@ -12,7 +12,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .container {
-  max-width: 1400px; /* Increased container width */
+  max-width: 90%; /* Increased container width */
   margin: auto;
   padding: 20px;
   background-color: #fff;
@@ -123,8 +123,12 @@ input[type="password"] {
 
 .table-responsive {
   overflow-x: auto;
-  max-height: 300px;   /* Maximum height for the table */
+  max-height: 800px;   /* Maximum height for the table */
   overflow-y: auto;    /* Enable vertical scroll */
+}
+
+.table-responsive-x {
+  overflow-x: auto;
 }
 
 .table {
@@ -318,6 +322,17 @@ input[type="file"] {
 
 @media (max-width: 480px) {
   .table-info {
+    display: block;
+  }
+}
+
+.form-add {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 480px) {
+  .form-add {
     display: block;
   }
 }

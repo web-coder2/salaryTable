@@ -17,27 +17,34 @@
     <div class="container">
         <h1>HBACash</h1>
         <a href="{{ url_for('logout') }}" class="logout-link">Выйти</a>
-        <h2>Форма Ввода Данных</h2>
-        <form @submit.prevent="addRecord">
-            <label for="date">Дата:</label>
-            <input type="date" id="date" v-model="formData.date" required><br><br>
-
-            <label for="robot">Робот:</label>
-            <input type="number" id="robot" v-model.number="formData.robot" required><br><br>
-
-            <label for="summHold">Сумма HOLD:</label>
-            <input type="number" id="summHold" v-model.number="formData.summHold" required><br><br>
-
-            <label for="differ">Разница:</label>
-            <input type="number" id="differ" v-model.number="formData.differ" required><br><br>
-
-            <label for="oklad">Оклад:</label>
-            <input type="number" id="oklad" v-model.number="formData.oklad" required><br><br>
-
-            <label for="office">Офис:</label>
-            <input type="number" id="office" v-model.number="formData.office" required><br><br>
-
-            <button type="submit" class="btn btn-success" :class="{ 'adding-animation': isAdding }">Добавить Запись в БД
+        <form @submit.prevent="addRecord" style="margin-top: 30px;">
+            <div class="form-add">
+                <div style="display: block;">
+                    <label for="date">Дата:</label>
+                    <input type="date" id="date" v-model="formData.date" required><br><br>
+                </div>
+                <div style="display: block;">
+                    <label for="robot">Робот:</label>
+                    <input type="number" id="robot" v-model.number="formData.robot" required><br><br>
+                </div>
+                <div style="display: block;">
+                    <label for="summHold">Сумма HOLD:</label>
+                    <input type="number" id="summHold" v-model.number="formData.summHold" required><br><br>
+                </div>
+                <div style="display: block;">
+                    <label for="differ">Разница:</label>
+                    <input type="number" id="differ" v-model.number="formData.differ" required><br><br>
+                </div>
+                <div style="display: block;">
+                    <label for="oklad">Оклад:</label>
+                    <input type="number" id="oklad" v-model.number="formData.oklad" required><br><br>
+                </div>
+                <div style="display: block;">
+                    <label for="office">Офис:</label>
+                    <input type="number" id="office" v-model.number="formData.office" required><br><br>
+                </div>
+            </div>
+            <button type="submit" style="margin-top: 30px; margin-bottom: 30px;" class="btn btn-success" :class="{ 'adding-animation': isAdding }">Добавить Запись в БД
             </button>
         </form>
 
@@ -55,7 +62,7 @@
             <button type="submit" class="btn btn-success">Обновить Значения по Умолчанию</button>
         </form>
 
-        <div class="edit-table-section table-responsive">
+        <div class="edit-table-section table-responsive-x">
             <h2>Таблица Лестницы</h2>
             <table class="table table-bordered">
                 <thead>
@@ -75,11 +82,11 @@
                 </tr>
                 </tbody>
             </table>
-            <button @click="saveLadder" class="btn btn-success" style="margin-top: 20px;">Сохранить Лестницу</button>
+            <!--<button @click="saveLadder" class="btn btn-success" style="margin-top: 20px;">Сохранить Лестницу</button>-->
         </div>
 
         <div class="table-info">
-            <h2>Все Записи</h2>
+            <h2 style="color: blue;">Все Записи по новой сетки</h2>
             <button class="btn btn-danger" @click="sortMode =! sortMode">сортировать по [[ sortMode ? 'возрастанию' : 'убиванию' ]] даты</button>
         </div>
         <div class="table-responsive">
@@ -130,7 +137,7 @@
 
 
         <div class="table-responsive" style="margin-top: 30px;">
-            <h4>По старой сетке</h4>
+            <h2 style="color: purple;">Все записи по старой сетке</h2>
             <table class="table table-bordered entry-table">
                 <thead style="position: sticky; top: 0px;">
                 <tr>
@@ -180,7 +187,7 @@
 
         <div class="grouped-tables-container">
             <div class="grouped-data-section">
-                <button @click="toggleMonthlyTable" class="btn btn-info" style="margin-top: 20px;">
+                <button @click="toggleMonthlyTable" class="btn btn-info" style="margin-top: 40px;">
                     [[ showMonthlyTable ? 'скрыть за месяц' : 'показать за месяц' ]]
                 </button>
                 <!--<div class="table-responsive">
@@ -212,8 +219,11 @@
                         </tbody>
                     </table>
                 </div>-->
-                <div v-for="yearData in monthlyCalculations" :key="yearData.year" class="table-responsive" style="margin-top: 20px;">
-                    <!--<h2 v-if="showMonthlyTable" style="color: green; position: relative; top: 0px;">[[ yearData.year ]]</h2>-->
+
+                <!--<h2 style="font-weight: bold; color: blue;" v-if="showMonthlyTable">таблица со средними по месяцам по новой сетке</h2>-->
+
+                <div v-for="yearData in monthlyCalculations" :key="yearData.year" class="table-responsive-x" style="margin-top: 20px;">
+                    <h2 style="font-weight: bold; color: blue;" v-if="showMonthlyTable">таблица со средними по месяцам по новой сетке [[ yearData.year ]]</h2>
                     <table v-if="showMonthlyTable" class="table table-bordered" style="margin-top: 20px;">
                         <thead>
                         <tr style="position: sticky; top: 0px; background-color: #515151;">
@@ -267,10 +277,10 @@
                     <!-- Другие таблицы, использующие yearData -->
                 </div>
 
-                <h2 style="font-weight: bold; color: red;" v-if="showMonthlyTable">таблица с среднеми по месяцам по старой сетке</h2>
+                <!--<h2 style="font-weight: bold; color: purple;" v-if="showMonthlyTable">таблица со средними по месяцам по старой сетке</h2>-->
 
-                <div v-for="yearData in monthlyCalculations" :key="yearData.year" class="table-responsive" style="margin-top: 20px;">
-                    <!--<h2 v-if="showMonthlyTable" style="color: green; position: relative; top: 0px;">[[ yearData.year ]]</h2>-->
+                <div v-for="yearData in monthlyCalculations" :key="yearData.year" style="margin-top: 20px;" class="table-responsive-x">
+                    <h2 style="font-weight: bold; color: purple;" v-if="showMonthlyTable">таблица со средними по месяцам по старой сетке [[ yearData.year ]]</h2>
                     <table v-if="showMonthlyTable" class="table table-bordered" style="margin-top: 20px;">
                         <thead>
                         <tr style="position: sticky; top: 0px; background-color: #515151;">
