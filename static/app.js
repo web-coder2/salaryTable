@@ -40,8 +40,8 @@ createApp({
             showMonthlyTable: false,
             showYearlyTable: false,
             isAdding: false,
-            //api_route: "http://localhost:5000/",  // перед продом поменять на http://31.130.151.240:80/
-            api_route: "http://31.130.151.240:80/",
+            api_route: "http://localhost:5000/",  // перед продом поменять на http://31.130.151.240:80/
+            //api_route: "http://31.130.151.240:80/",
             monthNames: [
                 "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
                 "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -482,13 +482,19 @@ createApp({
         toggleYearlyTable() {
             this.showYearlyTable = !this.showYearlyTable;
         },
-        getTotalColor(total) {
-            if (total > 0) {
+        getTotalColor(total, idx) {
+            if (total > 0 && idx % 2 == 0) {
                 return 'rgba(42, 96, 42, 0.5)'; // Green for positive total
-            } else if (total < 0) {
+            } if (total < 0 && idx % 2 == 0) {
                 return 'rgba(240, 63, 63, 0.5)'; // Red for negative total
-            } else {
+            } if (total == 0 && idx % 2 == 0) {
                 return 'rgba(250, 250, 11, 0.5)'; // Yellow for zero
+            } if (total > 0 && idx % 2 != 0) {
+                return 'rgba(70, 96, 45, 0.7)';
+            } if (total < 0 && idx % 2 != 0) {
+                return 'rgba(213, 60, 60, 0.7)';
+            } else {
+                return 'rgba(186, 254, 11, 0.7)';
             }
         },
     }

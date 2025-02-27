@@ -111,8 +111,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="calculation in calculations" :key="calculation.id"
-                    :style="{ backgroundColor: getTotalColor(calculation.total) }">
+                <tr v-for="(calculation, idx) in calculations" :key="calculation.id"
+                    :style="{ backgroundColor: getTotalColor(calculation.total, idx) }">
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[formatDate(calculation.date)]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.robot]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.summHold]]</td>
@@ -159,8 +159,8 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="calculation in calculations" :key="calculation.id"
-                    :style="{ backgroundColor: getTotalColor(calculation.total2) }">
+                <tr v-for="(calculation, idx) in calculations" :key="calculation.id"
+                    :style="{ backgroundColor: getTotalColor(calculation.total2, idx) }">
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[formatDate(calculation.date)]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.robot]]</td>
                     <td style="text-align: right; font-weight: bold; vertical-align: middle;">[[calculation.summHold]]</td>
@@ -239,7 +239,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total) }">
+                        <tr v-for="(monthData, idx) in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total, idx) }">
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic ]]</td>
                             <td>[[ monthData.salarySuper ]]</td>
@@ -297,7 +297,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="monthData in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total2) }">
+                        <tr v-for="(monthData, idx) in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total2, idx) }">
                             <td>[[ monthData.count ]]</td>
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic2 ]]</td>
