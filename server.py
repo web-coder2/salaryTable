@@ -240,6 +240,14 @@ def calculate():
         total = round(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic)
         total2 = round(officeSalary - spent - salaryDirector2 - salarySuper2 - salaryTraffic2)
 
+
+    #if salarySuper > 0:
+    #    salarySuper = rounder(salarySuper + (total / 100), 0)
+    #if salaryTraffic > 0:
+    #    salaryTraffic = rounder(salaryTraffic + (total / 100),0)
+
+    #total = rounder(total - (total/50))
+
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     cursor.execute('''
@@ -396,20 +404,19 @@ def update_defaults():
 
         calculation_id, date, robot, summHold, differ, oklad, office, defaultSuper, defaultDirector, defaultTraffic = row
 
-        # Calculate dependent values
         aproov = 0.6
         nalog = rounder((summHold + differ) * 10 * aproov * 0.07, 0)
         salary = rounder((0.37 * (summHold * aproov)) / 0.63 + summHold * aproov, 0)
         spent = rounder(robot + oklad + office + nalog + salary, 0)
         officeSalary = rounder((differ + summHold) * aproov * 10, 0)
 
-        # Retrieve default values from the database
         salarySuper = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'new') if officeSalary - spent > 0 else defaultSuper2, 0)
         #salaryDirector = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'new') if officeSalary - spent > 0 else defaultDirector2, 0)
         salaryDirector = 0
         salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'new') if officeSalary - spent > 0 else defaultTraffic2, 0)
 
         total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+
 
         salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else defaultSuper2, 0)
         #salaryDirector2 = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector2, 0)
@@ -418,7 +425,6 @@ def update_defaults():
 
         total2 = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
-        # Update the calculation in the database
         cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ?, salarySuper2 = ?, salaryDirector2 = ?, salaryTraffic2 = ?, total2 = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2, calculation_id))
     
     conn.commit()

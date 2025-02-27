@@ -79,20 +79,20 @@ createApp({
             this.calculations.forEach(calc => {
                 const date = new Date(calc.date);
                 const year = date.getFullYear();
-                const month = date.getMonth(); // Get month as a number (0-11)
+                const month = date.getMonth();
                 const monthName = this.monthNames[month];
 
                 if (!yearlyData[year]) {
                     yearlyData[year] = {
                         year: year,
-                        months: Array(12).fill(null).map((_, i) => ({ // Pre-populate with 12 months
+                        months: Array(12).fill(null).map((_, i) => ({
                             month: this.monthNames[i],
                             monthNumber: i,
                             salaryTraffic: 0,
                             salarySuper: 0,
                             salaryDirector: 0,
                             total: 0,
-                            count: 0,  // Initialize count,
+                            count: 0,
                             robot: 0,
                             summHold: 0,
                             differ: 0,
@@ -123,27 +123,21 @@ createApp({
                 yearlyData[year].months[month].salaryTraffic += calc.salaryTraffic;
                 yearlyData[year].months[month].salarySuper += calc.salarySuper;
                 yearlyData[year].months[month].salaryDirector += calc.salaryDirector;
-                // для старой сетки тут будет //
                 yearlyData[year].months[month].salarySuper2 += calc.salarySuper2
                 yearlyData[year].months[month].salaryTraffic2 += calc.salaryTraffic2
                 yearlyData[year].months[month].salaryDirector2 += calc.salaryDirector2
                 yearlyData[year].months[month].total2 += calc.total2
-                // вот здесь закончится )))  //
                 yearlyData[year].months[month].total += calc.total;
                 yearlyData[year].months[month].robot += calc.robot;
                 yearlyData[year].months[month].summHold += calc.summHold;
                 yearlyData[year].months[month].differ += calc.differ;
                 yearlyData[year].months[month].oklad += calc.oklad;
                 yearlyData[year].months[month].office += calc.office;
-                yearlyData[year].months[month].count++; // Increment count
-
-                // а точно также //
+                yearlyData[year].months[month].count++;
                 yearlyData[year].totalSalaryTraffic2 += calc.salaryTraffic2
                 yearlyData[year].totalSalaryDirector2 += calc.salaryDirector2
                 yearlyData[year].totalSalarySuper2 += calc.salarySuper2
-                yearlyData[year].totalTotal2 += calc.total2
-                // да ПИЗДА //
-                    
+                yearlyData[year].totalTotal2 += calc.total2                   
                 yearlyData[year].totalSalaryTraffic += calc.salaryTraffic;
                 yearlyData[year].totalSalarySuper += calc.salarySuper;
                 yearlyData[year].totalSalaryDirector += calc.salaryDirector;
@@ -156,7 +150,6 @@ createApp({
 
             });
 
-            // Convert the yearlyData object into an array of years
             const result = Object.values(yearlyData).map(yearData => {
 
                 let monthsWithData = 0;
@@ -175,9 +168,6 @@ createApp({
                 const averageDiffer = monthsWithData > 0 ? yearData.totalDiffer / monthsWithData : 0;
                 const averageOklad = monthsWithData > 0 ? yearData.totalOklad / monthsWithData : 0;
                 const averageOffice = monthsWithData > 0 ? yearData.totalOffice / monthsWithData : 0;
-
-                // тут я тоже все для старйо сетки делаю
-
                 const averageTotal2 = monthsWithData > 0 ? yearData.totalTotal2 / monthsWithData : 0;
                 const averageSalaryTraffic2 = monthsWithData > 0 ? yearData.totalSalaryTraffic2 / monthsWithData : 0;
                 const averageSalarySuper2 = monthsWithData > 0 ? yearData.totalSalarySuper2 / monthsWithData : 0;
@@ -185,9 +175,8 @@ createApp({
 
                 return {
                     year: yearData.year,
-                    months: yearData.months,  // Months are already pre-populated and will be 0 if no data
-
-                    // возвращать средняя значения для таблицы
+                    months: yearData.months,
+                    
                     averageSalaryTraffic: averageSalaryTraffic,
                     averageSalarySuper: averageSalarySuper,
                     averageSalaryDirector: averageSalaryDirector,
@@ -202,18 +191,14 @@ createApp({
                     averageSalaryDirector2: averageSalaryDirector2,
                     averageSalaryTraffic2: averageSalaryTraffic2,
 
-
-                    // овзвращает тотал значения для таблицу
                     totalSalaryTraffic: yearData.totalSalaryTraffic,
                     totalSalarySuper: yearData.totalSalarySuper,
                     totalSalaryDirector:  yearData.totalSalaryDirector,
                     totalTotal: yearData.totalTotal,
-
                     totalSalaryTraffic2: yearData.totalSalaryTraffic2,
                     totalSalarySuper2: yearData.totalSalarySuper2,
                     totalSalaryDirector2:  yearData.totalSalaryDirector2,
                     totalTotal2: yearData.totalTotal2,
-
                     totalRobot: yearData.totalRobot,
                     totalSummHold: yearData.totalSummHold,
                     totalDiffer: yearData.totalDiffer,
