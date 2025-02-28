@@ -189,6 +189,10 @@ def index():
     return render_template('index.html')
 
 
+superDeferOld = 0
+traficDeferOld = 0
+
+
 @app.route('/calculate', methods=['POST'])
 @login_required
 def calculate():
@@ -221,9 +225,9 @@ def calculate():
     salaryDirector = 0 #rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'new') if officeSalary - spent > 0 else defaultDirector, 0)
     salaryTraffic = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'new') if officeSalary - spent > 0 else defaultTraffic, 0)
 
-    salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary- spent > 0 else defaultSuper, 0)
+    salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary- spent > 0 else superDeferOld, 0)
     salaryDirector2 = 0 #rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector, 0)
-    salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic, 0)
+    salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else traficDeferOld, 0)
 
 
     if summHold == 0:
@@ -354,11 +358,11 @@ def update_ladder():
             total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
 
-            salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else defaultSuper, 0)
+            salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else superDeferOld, 0)
             #salaryDirector2 = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector, 0)
             salaryDirector2 = 0
 
-            salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic, 0)
+            salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else traficDeferOld, 0)
 
             total2 = rounder(officeSalary - spent - salaryDirector2 - salarySuper2 - salaryTraffic2, 0)
 
@@ -418,12 +422,12 @@ def update_defaults():
         total = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
 
 
-        salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else defaultSuper2, 0)
+        salarySuper2 = rounder(lookup_ladder(officeSalary - spent, 'Супервайзер', date, 'old') if officeSalary - spent > 0 else superDeferOld, 0)
         #salaryDirector2 = rounder(lookup_ladder(officeSalary - spent, 'Директор', date, 'old') if officeSalary - spent > 0 else defaultDirector2, 0)
         salaryDirector2 = 0
-        salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else defaultTraffic2, 0)
+        salaryTraffic2 = rounder(lookup_ladder(officeSalary - spent, 'Трафик-менеджер', date, 'old') if officeSalary - spent > 0 else traficDeferOld, 0)
 
-        total2 = rounder(officeSalary - spent - salaryDirector - salarySuper - salaryTraffic, 0)
+        total2 = rounder(officeSalary - spent - salaryDirector2 - salarySuper2 - salaryTraffic2, 0)
 
         cursor.execute("UPDATE salary_calculations SET nalog = ?, salary = ?, spent = ?, officeSalary = ?, salarySuper = ?, salaryDirector = ?, salaryTraffic = ?, total = ?, salarySuper2 = ?, salaryDirector2 = ?, salaryTraffic2 = ?, total2 = ? WHERE id = ?", (nalog, salary, spent, officeSalary, salarySuper, salaryDirector, salaryTraffic, total, salarySuper2, salaryDirector2, salaryTraffic2, total2, calculation_id))
     
