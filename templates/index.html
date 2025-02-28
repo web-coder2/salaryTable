@@ -230,12 +230,18 @@
                             <th>Месяц <span style="color: green;">([[ yearData.year ]] год)</span></th>
                             <th>Зарплата Трафик</th>
                             <th>Зарплата Супер</th>
+
+                            <th>ЗП Трафика с бонусами</th>
+                            <th>ЗП Супер с бонусами</th>
+
                             <th>Робот</th>
                             <th>Сумма HOLD</th>
                             <th>Разница</th>
                             <th>Оклад</th>
                             <th>Офис</th>
                             <th>Итого</th>
+
+                            <th>Итого с бонусами</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -243,34 +249,58 @@
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic ]]</td>
                             <td>[[ monthData.salarySuper ]]</td>
+
+                            <td>[[ getBonus(monthData.salaryTraffic, monthData.total) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(monthData.total, 1) ]]</span>)</td>
+
+                            <td>[[ getBonus(monthData.salarySuper, monthData.total) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(monthData.total, 1) ]]</span>)</td>
+
                             <td>[[ monthData.robot ]]</td>
                             <td>[[ monthData.summHold ]]</td>
                             <td>[[ monthData.differ ]]</td>
                             <td>[[ monthData.oklad ]]</td>
                             <td>[[ monthData.office ]]</td>
                             <td>[[ monthData.total ]]</td>
+
+                            <td>[[ getPercent(monthData.total, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(monthData.total, 2) ]]</span>)</td>
+
                         </tr>
                         <tr class="middle-table-td2">
                             <td style="font-weight: bold">Среднее значение</td>
-                            <td style="font-weight: bold">[[ yearData.averageSalaryTraffic.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageSalarySuper.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageRobot.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageSummHold.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageDiffer.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageOklad.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageOffice.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.averageTotal.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageSalaryTraffic) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.averageSalarySuper ]]</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.averageSalaryTraffic, yearData.averageTotal) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.averageTotal, 1) ]]</span>)</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.averageSalarySuper,yearData.averageTotal) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.averageTotal, 1) ]]</span>)</td>
+
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageRobot) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageSummHold) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageDiffer) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageOklad) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageOffice) ]]</td>
+                            <td style="font-weight: bold">[[ Math.floor(yearData.averageTotal) ]]</td>
+
+                            <td style="font-weight: bold;">[[  getPercent(yearData.averageTotal, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(yearData.averageTotal, 2) ]]</span>)</td>
+
                         </tr>
                         <tr class="middle-table-td">
                             <td style="font-weight: bold">Итого за год</td>
-                            <td style="font-weight: bold">[[ yearData.totalSalaryTraffic.toFixed(2) ]]</td>
-                            <td style="font-weight: bold">[[ yearData.totalSalarySuper.toFixed(2) ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalSalaryTraffic ]]</td>
+                            <td style="font-weight: bold">[[ yearData.totalSalarySuper ]]</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.totalSalaryTraffic, yearData.totalTotal ) ]] (<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.totalTotal, 1) ]]</span>)</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.totalSalarySuper, yearData.totalTotal ) ]] (<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.totalTotal, 1) ]]</span>)</td>
+
                             <td style="font-weight: bold">[[ yearData.totalRobot.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalSummHold.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalDiffer.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalOklad.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalOffice.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalTotal.toFixed(2) ]]</td>
+
+                            <td style="font-weight: bold;">[[  getPercent(yearData.totalTotal, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(yearData.totalTotal, 2) ]]</span>)</td>
+
                         </tr>
                         </tbody>
                     </table>
@@ -284,54 +314,78 @@
                     <table v-if="showMonthlyTable" class="table table-bordered" style="margin-top: 20px;">
                         <thead>
                         <tr style="position: sticky; top: 0px; background-color: #515151;">
-                            <th>Число дней</th>
                             <th>Месяц <span style="color: green;">([[ yearData.year ]] год)</span></th>
                             <th>Зарплата Трафик</th>
                             <th>Зарплата Супер</th>
+
+                            <th>ЗП Трафика с бонусами</th>
+                            <th>ЗП Супер с бонусами</th>
+
                             <th>Робот</th>
                             <th>Сумма HOLD</th>
                             <th>Разница</th>
                             <th>Оклад</th>
                             <th>Офис</th>
                             <th>Итого</th>
+
+                            <th>Итого с бонусами</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr v-for="(monthData, idx) in yearData.months" :key="monthData.monthNumber" :style="{ backgroundColor: getTotalColor(monthData.total2, idx) }">
-                            <td>[[ monthData.count ]]</td>
                             <td>[[ monthData.month ]]</td>
                             <td>[[ monthData.salaryTraffic2 ]]</td>
                             <td>[[ monthData.salarySuper2 ]]</td>
+
+                            <td>[[ getBonus(monthData.salaryTraffic2, monthData.total2) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(monthData.total2, 1) ]]</span>)</td>
+
+                            <td>[[ getBonus(monthData.salarySuper2, monthData.total2) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(monthData.total2, 1) ]]</span>)</td>
+
                             <td>[[ monthData.robot ]]</td>
                             <td>[[ monthData.summHold ]]</td>
                             <td>[[ monthData.differ ]]</td>
                             <td>[[ monthData.oklad ]]</td>
                             <td>[[ monthData.office ]]</td>
                             <td>[[ monthData.total2 ]]</td>
+
+                            <td>[[ getPercent(monthData.total2, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(monthData.total2, 2) ]]</span>)</td>
                         </tr>
                         <tr class="middle-table-td2">
                             <td style="font-weight: bold">Среднее значение</td>
-                            <td style="font-weight: bold;">Месяц-Значение</td>
                             <td style="font-weight: bold">[[ yearData.averageSalaryTraffic2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageSalarySuper2.toFixed(2) ]]</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.averageSalaryTraffic2, yearData.averageTotal2) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.averageTotal2, 1) ]]</span>)</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.averageSalarySuper2,yearData.averageTotal2) ]](<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.averageTotal2, 1) ]]</span>)</td>
+
                             <td style="font-weight: bold">[[ yearData.averageRobot.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageSummHold.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageDiffer.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageOklad.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageOffice.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.averageTotal2.toFixed(2) ]]</td>
+
+                            <td style="font-weight: bold;">[[  getPercent(yearData.averageTotal2, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(yearData.averageTotal2, 2) ]]</span>)</td>
                         </tr>
                         <tr class="middle-table-td">
                             <td style="font-weight: bold">Итого за год</td>
-                            <td style="font-weight: bold">Год-Значение</td>
                             <td style="font-weight: bold">[[ yearData.totalSalaryTraffic2.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalSalarySuper2.toFixed(2) ]]</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.totalSalaryTraffic2, yearData.totalTotal2 ) ]] (<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.totalTotal2, 1) ]]</span>)</td>
+
+                            <td style="font-weight: bold">[[ getBonus(yearData.totalSalarySuper2, yearData.totalTotal2 ) ]] (<span style="color: green; font-weight: bold;">⬆ [[ getPercent(yearData.totalTotal2, 1) ]]</span>)</td>
+
+
                             <td style="font-weight: bold">[[ yearData.totalRobot.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalSummHold.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalDiffer.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalOklad.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalOffice.toFixed(2) ]]</td>
                             <td style="font-weight: bold">[[ yearData.totalTotal2.toFixed(2) ]]</td>
+
+                            <td style="font-weight: bold;">[[  getPercent(yearData.totalTotal2, 98) ]] (<span style="color: red; font-weight: bold;">⬇ [[ getPercent(yearData.totalTotal2, 2) ]]</span>)</td>
                         </tr>
                         </tbody>
                     </table>

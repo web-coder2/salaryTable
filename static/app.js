@@ -482,5 +482,19 @@ createApp({
                 return 'rgba(186, 254, 11, 0.7)';
             }
         },
+        getBonus(salary, total) {
+            if (total > 0) {
+                return Math.floor(salary + (total / 100))
+            } if (total < 0) {
+                return 0
+            }
+        },
+        getPercent(total, percent) {
+            if (total > 0) {
+                return Math.floor(total / 100 * percent)
+            } if (total < 0) {
+                return 0
+            }
+        }
     }
 }).mount('#app');
